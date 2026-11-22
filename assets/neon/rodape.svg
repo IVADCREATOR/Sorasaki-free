@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="90" viewBox="0 0 900 90">
+  <defs>
+    <filter id="b" x="-20%" y="-80%" width="140%" height="260%">
+      <feGaussianBlur stdDeviation="5" result="x"/>
+      <feMerge><feMergeNode in="x"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <style>
+      .r { font: 700 24px 'Segoe UI', Verdana, sans-serif; letter-spacing: 6px; fill: #f3e6ff; animation: p 3s ease-in-out infinite; }
+      @keyframes p { 0%,100% { opacity: .6 } 50% { opacity: 1 } }
+    </style>
+  </defs>
+  <text x="450" y="54" text-anchor="middle" class="r" filter="url(#b)" stroke="#a259ff" stroke-width="1">✦ FEITO POR IVAD ✦</text>
+</svg>

@@ -109,6 +109,13 @@ export async function iniciar() {
     }
     if (connection === "close") {
       const codigo = lastDisconnect?.error?.output?.statusCode;
+      if ((codigo === DisconnectReason.loggedOut || codigo === 401) && !state.creds.registered) {
+        console.log("⚠️ O pareamento não foi concluído. Gerando um código novo...");
+        fs.rmSync(PASTA_SESSAO, { recursive: true, force: true });
+        codigoPedido = false;
+        setTimeout(iniciar, 3000);
+        return;
+      }
       if (codigo === DisconnectReason.loggedOut || codigo === 401) {
         console.log("🚪 Sessão encerrada no celular. Apague a pasta sessao e conecte de novo.");
         fs.rmSync(PASTA_SESSAO, { recursive: true, force: true });

@@ -54,8 +54,14 @@ export async function iniciar() {
   if (!state.creds.registered) {
     let numero = soNumero(cfg().numeroBot);
     if (!numero && process.stdin.isTTY) numero = soNumero(await perguntar("📱 Número do bot com DDI e DDD (ex: 5511999999999), ou Enter para usar QR Code: "));
+    if (numero && (numero.length === 10 || numero.length === 11)) numero = `55${numero}`;
+    if (numero && (numero.length < 12 || numero.length > 13)) {
+      console.log(`⚠️ Número inválido: ${numero}. Use 55 + DDD + número, ex: 5511999999999`);
+      numero = "";
+    }
     if (numero) {
       usandoCodigo = true;
+      console.log(`📲 Gerando código para +${numero}...`);
       setTimeout(async () => {
         try {
           const codigo = await sock.requestPairingCode(numero);

@@ -120,6 +120,10 @@ npm start
 
 Sem Git: baixe pelo botão **Code › Download ZIP**, extraia, abra a pasta, digite `cmd` na barra de endereço e rode `npm install` e `npm start`.
 Use o **Prompt de Comando (cmd)**, não o PowerShell. Se aparecer `npm.ps1 não pode ser carregado`, use `npm.cmd install` e `npm.cmd start`, ou rode uma vez no PowerShell: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` (responda `S`).
+**Deixar ligada sozinha no PC:** dê dois cliques no `iniciar-windows.bat` (na pasta da bot). Se a bot cair, ela volta sozinha.
+Para ligar junto com o Windows: aperte `Windows + R`, digite `shell:startup`, dê Enter e coloque ali um **atalho** do `iniciar-windows.bat`.
+O login fica salvo na pasta `sessao` e as configurações na pasta `data`: não apague essas pastas, senão precisa parear de novo.
+
 Deixe o PC ligado e sem hibernar enquanto a bot estiver rodando. Para religar: abra o `cmd` na pasta e rode `npm start`.
 
 ### 🖥️ Bronxys, Discloud ou qualquer VPS

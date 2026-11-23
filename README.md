@@ -119,6 +119,7 @@ npm start
 4. Digite o número do bot (com 55 e DDD) e use o código em **WhatsApp › Aparelhos conectados**.
 
 Sem Git: baixe pelo botão **Code › Download ZIP**, extraia, abra a pasta, digite `cmd` na barra de endereço e rode `npm install` e `npm start`.
+Use o **Prompt de Comando (cmd)**, não o PowerShell. Se aparecer `npm.ps1 não pode ser carregado`, use `npm.cmd install` e `npm.cmd start`, ou rode uma vez no PowerShell: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` (responda `S`).
 Deixe o PC ligado e sem hibernar enquanto a bot estiver rodando. Para religar: abra o `cmd` na pasta e rode `npm start`.
 
 ### 🖥️ Bronxys, Discloud ou qualquer VPS

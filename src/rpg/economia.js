@@ -5,6 +5,7 @@ import { CONFIG } from "./config.js";
 import { lerJson, salvarJson } from "./arquivo.js";
 import { usuario, alvos, participante, idsDoParticipante } from "./grupos.js";
 import { grupo, salvarGrupo } from "./dados.js";
+import { ehGrupoOficial } from "./oficial.js";
 
 const PASTA = path.join(CONFIG.pastas.dados, "economia");
 const arquivoDo = (jid) => path.join(PASTA, `${jid}.json`);
@@ -412,40 +413,62 @@ function grafico(hist) {
 }
 
 const ITENS = {
-  barraca: { nome: "Barraca de pastel", emoji: "🥟", preco: 2_000, renda: 10, cat: "comercio" },
-  lojinha: { nome: "Lojinha", emoji: "🏪", preco: 12_000, renda: 66, cat: "comercio" },
-  fazenda: { nome: "Fazenda", emoji: "🚜", preco: 45_000, renda: 260, cat: "agro" },
-  mineradora: { nome: "Mineradora", emoji: "⛏️", preco: 150_000, renda: 940, cat: "industria" },
-  predio: { nome: "Prédio comercial", emoji: "🏢", preco: 500_000, renda: 3_300, cat: "comercio" },
-  terreno: { nome: "Terreno", emoji: "🗺️", preco: 300_000, renda: 1_900, cat: "comercio" },
-  gado: { nome: "Rebanho de gado", emoji: "🐄", preco: 380_000, renda: 2_400, cat: "agro" },
-  plantacao: { nome: "Plantação de soja", emoji: "🌱", preco: 450_000, renda: 2_900, cat: "agro" },
-  haras: { nome: "Haras de cavalos", emoji: "🐎", preco: 650_000, renda: 4_300, cat: "agro" },
-  fazendao: { nome: "Fazenda de gado", emoji: "🐂", preco: 900_000, renda: 6_100, cat: "agro" },
-  usina: { nome: "Usina de cana", emoji: "🏭", preco: 1_500_000, renda: 10_000, cat: "industria" },
-  academia: { nome: "Academia", emoji: "🏋️", preco: 1_500_000, renda: 11_000, cat: "comercio", max: 2 },
-  restaurante: { nome: "Restaurante", emoji: "🍽️", preco: 2_250_000, renda: 16_000, cat: "comercio", max: 2 },
-  posto: { nome: "Posto de gasolina", emoji: "⛽", preco: 3_000_000, renda: 22_000, cat: "industria", max: 2 },
-  concessionaria: { nome: "Concessionária", emoji: "🚗", preco: 3_750_000, renda: 27_000, cat: "comercio", max: 2 },
-  construtora: { nome: "Construtora", emoji: "🏗️", preco: 5_250_000, renda: 38_000, cat: "industria", max: 2 },
-  cassino: { nome: "Cassino", emoji: "🎰", preco: 7_500_000, renda: 55_000, cat: "comercio", max: 2 },
-  hotel: { nome: "Hotel 5 estrelas", emoji: "🏨", preco: 6_000_000, renda: 46_000, cat: "comercio", max: 2 },
-  shopping: { nome: "Shopping center", emoji: "🛍️", preco: 10_000_000, renda: 79_000, cat: "comercio", max: 2 },
-  frigorifico: { nome: "Frigorífico", emoji: "🥩", preco: 15_000_000, renda: 120_000, cat: "agro", max: 2 },
-  petroleo: { nome: "Poço de petróleo", emoji: "🛢️", preco: 20_000_000, renda: 160_000, cat: "industria", max: 2 },
-  porto: { nome: "Porto de cargas", emoji: "🚢", preco: 30_000_000, renda: 250_000, cat: "comercio", max: 2 },
-  hidreletrica: { nome: "Usina hidrelétrica", emoji: "⚡", preco: 50_000_000, renda: 440_000, cat: "industria", max: 2 }
+  barraca: { nome: "Barraca de pastel", emoji: "🥟", preco: 600, renda: 15, cat: "comercio" },
+  lojinha: { nome: "Lojinha", emoji: "🏪", preco: 4_000, renda: 99, cat: "comercio" },
+  fazenda: { nome: "Fazenda", emoji: "🚜", preco: 16_000, renda: 390, cat: "agro" },
+  mineradora: { nome: "Mineradora", emoji: "⛏️", preco: 60_000, renda: 1_400, cat: "industria" },
+  predio: { nome: "Prédio comercial", emoji: "🏢", preco: 220_000, renda: 5_000, cat: "comercio" },
+  terreno: { nome: "Terreno", emoji: "🗺️", preco: 120_000, renda: 2_900, cat: "comercio" },
+  gado: { nome: "Rebanho de gado", emoji: "🐄", preco: 160_000, renda: 3_600, cat: "agro" },
+  plantacao: { nome: "Plantação de soja", emoji: "🌱", preco: 190_000, renda: 4_400, cat: "agro" },
+  haras: { nome: "Haras de cavalos", emoji: "🐎", preco: 300_000, renda: 6_500, cat: "agro" },
+  fazendao: { nome: "Fazenda de gado", emoji: "🐂", preco: 430_000, renda: 9_100, cat: "agro" },
+  usina: { nome: "Usina de cana", emoji: "🏭", preco: 700_000, renda: 15_000, cat: "industria" },
+  academia: { nome: "Academia", emoji: "🏋️", preco: 800_000, renda: 16_000, cat: "comercio", max: 2 },
+  restaurante: { nome: "Restaurante", emoji: "🍽️", preco: 1_200_000, renda: 24_000, cat: "comercio", max: 2 },
+  posto: { nome: "Posto de gasolina", emoji: "⛽", preco: 1_600_000, renda: 32_000, cat: "industria", max: 2 },
+  concessionaria: { nome: "Concessionária", emoji: "🚗", preco: 2_000_000, renda: 40_000, cat: "comercio", max: 2 },
+  construtora: { nome: "Construtora", emoji: "🏗️", preco: 2_900_000, renda: 58_000, cat: "industria", max: 2 },
+  cassino: { nome: "Cassino", emoji: "🎰", preco: 4_300_000, renda: 82_000, cat: "comercio", max: 2 },
+  hotel: { nome: "Hotel 5 estrelas", emoji: "🏨", preco: 3_600_000, renda: 69_000, cat: "comercio", max: 2 },
+  shopping: { nome: "Shopping center", emoji: "🛍️", preco: 6_300_000, renda: 120_000, cat: "comercio", max: 2 },
+  frigorifico: { nome: "Frigorífico", emoji: "🥩", preco: 9_700_000, renda: 180_000, cat: "agro", max: 2 },
+  petroleo: { nome: "Poço de petróleo", emoji: "🛢️", preco: 13_000_000, renda: 240_000, cat: "industria", max: 2 },
+  porto: { nome: "Porto de cargas", emoji: "🚢", preco: 21_000_000, renda: 380_000, cat: "comercio", max: 2 },
+  hidreletrica: { nome: "Usina hidrelétrica", emoji: "⚡", preco: 37_000_000, renda: 660_000, cat: "industria", max: 2 },
+  estadio: { nome: "Estádio de futebol", emoji: "🏟️", preco: 60_000_000, renda: 1_000_000, cat: "comercio", max: 1 },
+  supermercados: { nome: "Rede de supermercados", emoji: "🛒", preco: 80_000_000, renda: 1_300_000, cat: "comercio", max: 1 },
+  montadora: { nome: "Montadora de carros", emoji: "🚘", preco: 90_000_000, renda: 1_400_000, cat: "industria", max: 1 },
+  aerea: { nome: "Companhia aérea", emoji: "✈️", preco: 100_000_000, renda: 1_500_000, cat: "comercio", max: 1 },
+  refinaria: { nome: "Refinaria", emoji: "🔥", preco: 130_000_000, renda: 1_900_000, cat: "industria", max: 1 },
+  parque: { nome: "Parque de diversões", emoji: "🎡", preco: 160_000_000, renda: 2_300_000, cat: "comercio", max: 1 },
+  siderurgica: { nome: "Siderúrgica", emoji: "🔩", preco: 200_000_000, renda: 2_700_000, cat: "industria", max: 1 },
+  cafe: { nome: "Império do café", emoji: "☕", preco: 250_000_000, renda: 3_300_000, cat: "agro", max: 1 },
+  resorts: { nome: "Rede de resorts", emoji: "🏖️", preco: 300_000_000, renda: 3_900_000, cat: "comercio", max: 1 },
+  eolica: { nome: "Parque eólico", emoji: "🌬️", preco: 400_000_000, renda: 5_000_000, cat: "industria", max: 1 },
+  tv: { nome: "Canal de TV", emoji: "📺", preco: 500_000_000, renda: 6_100_000, cat: "comercio", max: 1 },
+  latifundio: { nome: "Latifúndio", emoji: "🌾", preco: 650_000_000, renda: 7_800_000, cat: "agro", max: 1 },
+  chips: { nome: "Fábrica de chips", emoji: "💾", preco: 800_000_000, renda: 9_300_000, cat: "industria", max: 1 },
+  nuclear: { nome: "Usina nuclear", emoji: "☢️", preco: 1_000_000_000, renda: 11_000_000, cat: "industria", max: 1 },
+  espacial: { nome: "Estação espacial", emoji: "🚀", preco: 1_500_000_000, renda: 17_000_000, cat: "industria", max: 1 },
+  lotepraia: { nome: "Lote na praia", emoji: "🏝️", preco: 45_000_000, renda: 680_000, cat: "terra", max: 1 },
+  terrenocentro: { nome: "Terreno no centro", emoji: "🏙️", preco: 70_000_000, renda: 990_000, cat: "terra", max: 1 },
+  terras: { nome: "Mil hectares de terra", emoji: "🌄", preco: 110_000_000, renda: 1_400_000, cat: "terra", max: 1 },
+  jazida: { nome: "Área de mineração", emoji: "🪨", preco: 180_000_000, renda: 2_200_000, cat: "terra", max: 1 },
+  ilhavirgem: { nome: "Ilha virgem", emoji: "🌴", preco: 280_000_000, renda: 3_300_000, cat: "terra", max: 1 },
+  quarteirao: { nome: "Quarteirão inteiro", emoji: "🏘️", preco: 450_000_000, renda: 4_900_000, cat: "terra", max: 1 },
+  reserva: { nome: "Reserva florestal", emoji: "🌳", preco: 700_000_000, renda: 7_300_000, cat: "terra", max: 1 }
 };
 
 const ARQ_AJUSTES = path.join(PASTA, "_ajustes.json");
 const ORIGINAIS = JSON.parse(JSON.stringify(ITENS));
 const PREMIUM_PADRAO = {
-  quiosque: { nome: "Quiosque Premium", emoji: "⭐", reais: 30, renda: 60_000 },
-  supermercado: { nome: "Supermercado Premium", emoji: "🛒", reais: 50, renda: 110_000 },
-  mansao: { nome: "Mansão Premium", emoji: "🏰", reais: 80, renda: 180_000 },
-  jatinho: { nome: "Jatinho Premium", emoji: "🛩️", reais: 120, renda: 280_000 },
-  ilha: { nome: "Ilha Particular", emoji: "🏝️", reais: 180, renda: 420_000 },
-  bancosora: { nome: "Banco Sora", emoji: "🏦", reais: 250, renda: 600_000 }
+  quiosque: { nome: "Quiosque Premium", emoji: "⭐", reais: 30, renda: 90_000 },
+  supermercado: { nome: "Supermercado Premium", emoji: "🛒", reais: 50, renda: 160_000 },
+  mansao: { nome: "Mansão Premium", emoji: "🏰", reais: 80, renda: 270_000 },
+  jatinho: { nome: "Jatinho Premium", emoji: "🛩️", reais: 120, renda: 420_000 },
+  ilha: { nome: "Ilha Particular", emoji: "🏝️", reais: 180, renda: 630_000 },
+  bancosora: { nome: "Banco Sora", emoji: "🏦", reais: 250, renda: 900_000 }
 };
 const CFG_PADRAO = {
   rouboMin: 5,
@@ -494,6 +517,8 @@ const EVENTOS_POSSIVEIS = [
   { id: "crise_comercio", cat: "comercio",  fator: 0.5,  emoji: "📉", nome: "Queda no comércio" },
   { id: "boom_industria", cat: "industria", fator: 1.7,  emoji: "🏭", nome: "Expansão industrial" },
   { id: "crise_industria",cat: "industria", fator: 0.35, emoji: "⚠️", nome: "Crise industrial" },
+  { id: "boom_terra",     cat: "terra",     fator: 1.4,  emoji: "🏡", nome: "Valorização imobiliária" },
+  { id: "crise_terra",    cat: "terra",     fator: 0.6,  emoji: "🏚️", nome: "Bolha imobiliária" },
   { id: "normal",         cat: null,        fator: 1.0,  emoji: "📊", nome: "Mercado estável" },
 ];
 
@@ -538,6 +563,7 @@ function rendaPendente(m) {
   return { valor: Math.floor(total), porHora: Math.floor(porHora + fixo), bonusPct: Math.round((bonus - 1) * 100) };
 }
 
+const porDia = (v) => `${moedas(Math.floor((v || 0) * 24))}/dia`;
 export function patrimonio(m) {
   let acoes = 0;
   for (const [t, a] of Object.entries(m.acoes || {})) acoes += (a?.qtd || 0) * precoAcao(t);
@@ -564,7 +590,7 @@ export function creditar(jid, id, valor, { comprado = false, tipo = null } = {})
   const m = conta(jid, id);
   const v = Math.max(0, Math.floor(Number(valor) || 0));
   m.carteira = Math.min(LIMITE, m.carteira + v);
-  if (!tx) anotar(m, tipo || (comprado ? "resgate" : "prêmio"), v, "sistema");
+  if (!tx) anotar(m, tipo || (comprado ? "resgate do site" : "prêmio"), v, "sistema");
   if (comprado) m.comprado = (m.comprado || 0) + v;
   marcar(jid);
   if (comprado) gravarEconomia();
@@ -583,6 +609,20 @@ function exigir(c, parte = null) {
   const eu = conta(c.jid, c.autorJid);
   darInicial(c.jid, eu);
   if (eu.congelado) { c.responder(`🧊 Sua conta do RPG está congelada pelo dono${eu.congelado.motivo ? `: ${eu.congelado.motivo}` : ""}.`); return null; }
+  if (c.ehDono) {
+    const ano = Date.now() + 365 * DIA;
+    if (!(eu.vip?.ate > Date.now() + 300 * DIA)) { eu.vip = { desde: Date.now(), ...(eu.vip || {}), ate: ano, dono: true }; marcar(c.jid); }
+    eu.presoAte = 0; eu.mortoAte = 0;
+  }
+  if (eu.presoAte > Date.now()) { c.responder(`⛓️ Você está preso! Sai em *${espera(eu.presoAte - Date.now())}*.\n💸 Pague a fiança: *${c.prefixo}fianca*`); return null; }
+  if (eu.mortoAte > Date.now()) { c.responder(`💀 Você foi abatido pelo BOPE. Volta em *${espera(eu.mortoAte - Date.now())}*.`); return null; }
+  if (CRIME_CMDS.has(String(c.cmd || "").toLowerCase()) && !c.ehDono) eu.procuradoAte = Date.now() + PROCURADO_MIN * MIN;
+  if (eu.cartao) atualizarCartao(eu);
+  if (eu.negativo > 0) {
+    cobrarNegativo(eu);
+    marcar(c.jid);
+    if (eu.negativo > 0 && ["apostas", "loja", "investir", "bolsa"].includes(parte)) { c.responder(`🔴 Você está negativado (-${fmt(eu.negativo)}). Pague com *${c.prefixo}pagarfatura tudo*.`); return null; }
+  }
   const nomes = { investir: "Os investimentos estão desligados", apostas: "As apostas estão desligadas", bolsa: "A bolsa está desligada", loja: "A loja de propriedades está desligada", roubo: "O roubo está desligado", emprestimo: "Os empréstimos estão desligados", resgate: "O resgate de moedas do site está desligado" };
   if (parte && !cfg[parte]) { c.responder(`🚫 ${nomes[parte]}. Use ${c.prefixo}rpgconfig ${parte} 1`); return null; }
   return cfg;
@@ -636,7 +676,7 @@ def(["carteira", "saldo", "bal", "meusaldo"], {}, async (c) => {
     `💵 Na mão: *${moedas(m.carteira)}*\n🏦 No banco: *${moedas(m.banco)}*\n📈 Em ações: *${moedas(acoes)}*\n` +
     `🏠 Propriedades: ${itens || "nenhuma"}${renda ? ` _(+${fmt(renda)} para coletar)_` : ""}\n` +
     `🐷 Poupança: *${moedas(m.poupanca?.valor || 0)}* · 🏛️ CDB: *${moedas((m.cdbs || []).reduce((s, x) => s + x.valor, 0))}*\n\n` +
-    `💎 Patrimônio: *${moedas(patrimonio(m))}*${m.comprado ? `\n🛒 Compradas: ${moedas(m.comprado)}` : ""}${pausa}${linhaDivida(c.jid, alvo)}\n\n` +
+    `💎 Patrimônio: *${moedas(patrimonio(m))}*${m.comprado ? `\n🛒 Compradas: ${moedas(m.comprado)}` : ""}${pausa}${linhaDivida(c.jid, alvo)}${linhaBC(m)}\n\n` +
     `${ehVipConta(m) ? `\n💎 *VIP* até ${new Date(m.vip.ate).toLocaleDateString("pt-BR")}` : ""}\n🌐 _Suas moedas valem em todos os grupos da Hina._\n_O que está na mão pode ser roubado; o banco é seguro._`, [alvo]);
 });
 
@@ -713,16 +753,20 @@ def(["roubar", "furtar", "roubarpoupanca", "roubarpoupança", "assaltarpoupanca"
   if (falta > 0) return c.responder(`🕶️ Melhor esperar a poeira baixar. Tente em *${espera(falta)}*.`);
   const saldo = () => Math.floor(naPoupanca ? (vitima.poupanca?.valor || 0) : vitima.carteira);
   const tirar = (v) => { if (naPoupanca) vitima.poupanca.valor -= v; else vitima.carteira -= v; };
-  if (saldo() < 200) return c.responder(naPoupanca ? `🐷 A poupança de ${marca(alvo)} está quase vazia. Nem vale o risco. 🫥` : `${marca(alvo)} está com a carteira quase vazia. Nem vale o risco. 🫥`, [alvo]);
+  if (saldo() < (naPoupanca ? 1_000 : 200)) return c.responder(naPoupanca ? `🐷 A poupança de ${marca(alvo)} está vazia. Nada pra roubar. 🫥` : `${marca(alvo)} está com a carteira quase vazia. Nem vale o risco. 🫥`, [alvo]);
+  if (naPoupanca && eu.carteira < 500) return c.responder(`🥷 Para roubar poupança você precisa ter *${moedas(500)}* na mão (é a multa se der ruim).`);
   if (Date.now() - (vitima.roubadoEm || 0) < CFG_JOGO().rouboMin * MIN) return c.responder(`${marca(alvo)} acabou de ser roubado(a) e está atento(a). Tente mais tarde.`, [alvo]);
   const pedidoTxt = valoresDe(c).find((a) => !/^\+?\d{10,}$/.test(a) && !/^poup/i.test(a) && lerValor(a, saldo()) > 0);
   const pedido = pedidoTxt ? lerValor(pedidoTxt, saldo()) : 0;
   if (pedidoTxt && pedido > saldo()) return c.responder(`${marca(alvo)} só tem ${moedas(saldo())} na ${onde}. Escolha um valor até isso.`, [alvo]);
+  const tetoPoup = Math.max(0, eu.carteira) + 1_000;
+  if (naPoupanca && pedido > tetoPoup) return c.responder(`🐷 Você só consegue roubar da poupança até *${moedas(tetoPoup)}* (o que tem na mão + 🪙 1.000).`);
   const fatia = pedido ? pedido / saldo() : 0;
   const chanceRoubo = naPoupanca ? (pedido ? Math.max(0.05, 0.35 - 0.3 * fatia) : 0.3) : (pedido ? Math.max(0.08, 0.5 - 0.42 * fatia) : 0.4);
   eu.ultimoRoubo = Date.now();
   if (chance(chanceRoubo)) {
-    const valor = pedido || Math.floor(saldo() * (naPoupanca ? sorteio(3, 10) : sorteio(5, 15)) / 100);
+    const bruto = pedido || Math.floor(saldo() * (naPoupanca ? sorteio(3, 10) : sorteio(5, 15)) / 100);
+    const valor = naPoupanca ? Math.min(bruto, tetoPoup) : bruto;
     tirar(valor); eu.carteira += valor; vitima.roubadoEm = Date.now();
     marcar(c.jid);
     return c.responder(`🥷 ${marca(c.autorJid)} roubou *${moedas(valor)}* ${naPoupanca ? "da 🐷 poupança" : "da carteira"} de ${marca(alvo)}!${pedido ? ` _(chance era de ${Math.round(chanceRoubo * 100)}%)_` : ""}\n_Dica: só o ${c.prefixo}banco (VIP) fica totalmente seguro._`, [c.autorJid, alvo]);
@@ -1032,6 +1076,7 @@ def(["perdoardivida", "perdoardívida", "perdoar"], G, async (c) => {
 });
 
 export const TERMOS_VERSAO = "2026-10-18";
+const urlTermos = () => `${String(process.env.SORASAKI_SITE_URL || CONFIG.site || "https://hinahost.tech").replace(/\/+$/, "")}/termos-rpg`;
 const RESUMO_TERMOS = (p) => `📜 *TERMOS DO RPG*\n\n` +
   `• Apostas e ações podem fazer você perder moedas.\n` +
   `• Moedas não são dinheiro: sem saque.\n\n` +
@@ -1375,7 +1420,7 @@ def(["loja", "propriedades", "imoveis"], G, async (c) => {
       m.carteira += renda - it.preco * qtd; m.ultimaColeta = Date.now();
       m.itens[nomeItem] = tem + qtd;
       marcar(c.jid);
-      return c.responder(`🎉 Comprou ${qtd > 1 ? `${qtd}× ` : ""}${it.emoji} *${it.nome}* por ${moedas(it.preco * qtd)}!\nRende ${moedas(it.renda * qtd)}/h (muda conforme o mercado) — colete com *${c.prefixo}coletar*.${renda ? `\n_(Renda pendente de ${moedas(renda)} já foi coletada.)_` : ""}`);
+      return c.responder(`🎉 Comprou ${qtd > 1 ? `${qtd}× ` : ""}${it.emoji} *${it.nome}* por ${moedas(it.preco * qtd)}!\nRende ${porDia(it.renda * qtd)} (muda conforme o mercado) — colete com *${c.prefixo}coletar*.${renda ? `\n_(Renda pendente de ${moedas(renda)} já foi coletada.)_` : ""}`);
     }
     if (qtd > tem) return c.responder(`Você tem ${tem}× ${it.nome}.`);
     const valor = Math.floor(it.preco * VENDA()) * qtd;
@@ -1391,13 +1436,13 @@ def(["loja", "propriedades", "imoveis"], G, async (c) => {
   const linhas = Object.entries(ITENS).filter(([, it]) => !it.premium && !it.off).map(([k, it]) => {
     const rendaHoje = Math.floor(it.renda * (merc.fatores?.[k] ?? 1));
     const diff = rendaHoje - it.renda;
-    const sinalRenda = diff > 0 ? ` 🟢 +${fmt(diff)}` : diff < 0 ? ` 🔴 −${fmt(-diff)}` : "";
+    const sinalRenda = diff > 0 ? ` 🟢 +${fmt(diff * 24)}` : diff < 0 ? ` 🔴 −${fmt(-diff * 24)}` : "";
     const tem = m.itens[k] || 0;
     const posse = !tem ? "" : maxDe(k) > 1 ? ` · ✅ ${tem}/${maxDe(k)}` : " · ✅ sua";
-    return `${k === "academia" ? "\n💼 *NEGÓCIOS* — até 2 de cada, se pagam em ~6 dias\n" : ""}${k === "hotel" ? "\n💎 *LUXO* — até 2 de cada\n" : ""}${it.emoji} *${it.nome}* (${k})\n   ${moedas(it.preco)} · hoje rende ${moedas(rendaHoje)}/h${sinalRenda}${posse}`;
+    return `${k === "academia" ? "\n💼 *NEGÓCIOS* — até 2 de cada, se pagam em ~6 dias\n" : ""}${k === "hotel" ? "\n💎 *LUXO* — até 2 de cada\n" : ""}${k === "estadio" ? "\n🌆 *IMPÉRIOS* — 1 de cada\n" : ""}${k === "lotepraia" ? "\n🗺️ *TERRENOS* — seguem o mercado imobiliário\n" : ""}${it.emoji} *${it.nome}* (${k})\n   ${moedas(it.preco)} · hoje rende ${porDia(rendaHoje)}${sinalRenda}${posse}`;
   });
   const { valor, porHora } = rendaPendente(m);
-  return c.responder(`🏘️ *LOJA DE PROPRIEDADES*${linhaEvento}\n\n${linhas.join("\n")}\n\n• *${c.prefixo}loja comprar fazenda*\n• *${c.prefixo}loja vender fazenda* (devolve ${Math.round(VENDA() * 100)}%)\n• *${c.prefixo}coletar* — recebe a renda (acumula até ${CFG_JOGO().acumulaHoras} h)${CFG_JOGO().premium ? `\n⭐ *Premium/VIP* — rendem muito mais, renda fixa e nunca dão prejuízo: *${c.prefixo}premium*` : ""}\n_Comuns: ${CFG_JOGO().maxComum} de cada · Negócios e Luxo: até 2 de cada (${c.prefixo}loja comprar hotel 2). A renda muda todo dia._\n\n${porHora ? `💰 Sua renda hoje: ${moedas(porHora)}/h · para coletar: ${moedas(valor)}` : "_Você ainda não tem propriedades._"}`);
+  return c.responder(`🏘️ *LOJA DE PROPRIEDADES*${linhaEvento}\n\n${linhas.join("\n")}\n\n• *${c.prefixo}loja comprar fazenda*\n• *${c.prefixo}loja vender fazenda* (devolve ${Math.round(VENDA() * 100)}%)\n• *${c.prefixo}coletar* — recebe a renda (acumula até ${CFG_JOGO().acumulaHoras} h)${CFG_JOGO().premium ? `\n⭐ *Premium/VIP* — rendem muito mais, renda fixa e nunca dão prejuízo: *${c.prefixo}premium*` : ""}\n_Comuns: ${CFG_JOGO().maxComum} de cada · Negócios e Luxo: até 2 de cada (${c.prefixo}loja comprar hotel 2). A renda muda todo dia._\n\n${porHora ? `💰 Sua renda hoje: ${porDia(porHora)} · para coletar: ${moedas(valor)}` : "_Você ainda não tem propriedades._"}`);
 });
 const ACHADOS = {
   chiclete: { nome: "Chiclete mascado", emoji: "🍬", valor: 300 },
@@ -1422,10 +1467,10 @@ const CAIXAS = {
   madeira: { nome: "Baú de Madeira", emoji: "🪵", preco: 35_000, inic: true, itens: { relogio: 7, oculos: 9, tenis: 12, fone: 14, skate: 15, celular: 14, videogame: 12, bicicleta: 8, guitarra: 5, notebook: 2.2, moto: 0.8 } },
   ferro: { nome: "Baú de Ferro", emoji: "⚙️", preco: 80_000, inic: true, itens: { tenis: 6, fone: 10, skate: 12, celular: 14, videogame: 15, bicicleta: 14, guitarra: 12, notebook: 9, moto: 5, joia: 2.2, carro: 0.8 } },
   prata: { nome: "Baú de Prata", emoji: "🥈", preco: 190_000, inic: true, itens: { skate: 5, celular: 9, videogame: 12, bicicleta: 14, guitarra: 15, notebook: 15, moto: 12, joia: 9, carro: 6, quadro: 3 } },
-  comum: { nome: "Caixa Comum", emoji: "🟢", preco: 400_000, faixa: [300_000, 1_500_000], pesos: { pouco: 36, medio: 27, muito: 8, prop: 20, brinde: 9, premium: 0 } },
-  rara: { nome: "Caixa Rara", emoji: "🔵", preco: 900_000, faixa: [650_000, 3_000_000], pesos: { pouco: 35, medio: 27, muito: 8, prop: 22, brinde: 8, premium: 0.05 } },
-  epica: { nome: "Caixa Épica", emoji: "🟣", preco: 1_800_000, faixa: [1_500_000, 6_000_000], pesos: { pouco: 34, medio: 27, muito: 9, prop: 23, brinde: 7, premium: 0.15 } },
-  lendaria: { nome: "Caixa Lendária", emoji: "🟡", preco: 3_000_000, faixa: [3_000_000, 10_000_000], pesos: { pouco: 34, medio: 27, muito: 9, prop: 24, brinde: 6, premium: 0.4 } },
+  comum: { nome: "Caixa Comum", emoji: "🟢", preco: 400_000, faixa: [120_000, 800_000], pesos: { pouco: 17, medio: 46, muito: 8, prop: 20, brinde: 9, premium: 0 } },
+  rara: { nome: "Caixa Rara", emoji: "🔵", preco: 900_000, faixa: [300_000, 1_600_000], pesos: { pouco: 16, medio: 46, muito: 8, prop: 22, brinde: 8, premium: 0.05 } },
+  epica: { nome: "Caixa Épica", emoji: "🟣", preco: 1_800_000, faixa: [700_000, 3_600_000], pesos: { pouco: 16, medio: 45, muito: 9, prop: 23, brinde: 7, premium: 0.15 } },
+  lendaria: { nome: "Caixa Lendária", emoji: "🟡", preco: 3_000_000, faixa: [1_600_000, 6_300_000], pesos: { pouco: 16, medio: 45, muito: 9, prop: 24, brinde: 6, premium: 0.4 } },
 };
 const APELIDO_CAIXA = { bau: "madeira", baú: "madeira", "baúdemadeira": "madeira", caixa: "caixote", verde: "comum", azul: "rara", roxa: "epica", épica: "epica", dourada: "lendaria", lendária: "lendaria", lenda: "lendaria" };
 const MULT_CAIXA = { pouco: [0.15, 0.55], medio: [0.7, 1.3], muito: [1.6, 3.5] };
@@ -1461,7 +1506,7 @@ function abrirUmaCaixa(m, cx) {
       const pesos = Object.fromEntries(opcoes.map(([k]) => [k, PESO_PREMIUM[k] ?? 1]));
       const k = sortearPeso(pesos), it = ITENS[k];
       m.itens[k] = (m.itens[k] || 0) + 1;
-      return { linha: `🌟🌟🌟 *PREMIUM!!!* ${it.emoji} *${it.nome}* (rende ${moedas(it.renda)}/h fixo, para sempre)`, valor: it.preco, premium: true };
+      return { linha: `🌟🌟🌟 *PREMIUM!!!* ${it.emoji} *${it.nome}* (rende ${porDia(it.renda)} fixo, para sempre)`, valor: it.preco, premium: true };
     }
     const v = cx.preco * 5; m.carteira += v;
     return { linha: `🌟 Premium repetida, virou ${moedas(v)}!`, valor: v };
@@ -1566,7 +1611,7 @@ def(["poupanca", "poupança"], G, async (c) => {
   const [acao, qtd] = [String(c.args[0] || "").toLowerCase(), c.args[1]];
   if (!["depositar", "dep", "sacar", "saque"].includes(acao)) {
     return c.responder(`🐷 *POUPANÇA*\n\n💰 Guardado: *${moedas(m.poupanca.valor)}*\n📈 Já rendeu: ${moedas(m.poupanca.juros || 0)}\n\n` +
-      `Rende *0,5% ao dia* (sobre até ${moedas(POUPANCA_TETO)}), sem risco e sem prazo.\n• *${c.prefixo}poupanca depositar 1000*\n• *${c.prefixo}poupanca sacar tudo*`);
+      `Rende *0,2% ao dia* (sobre até ${moedas(POUPANCA_TETO)}), sem risco e sem prazo.\n• *${c.prefixo}poupanca depositar 1000*\n• *${c.prefixo}poupanca sacar tudo*`);
   }
   const depositar = acao.startsWith("dep");
   const valor = lerValor(qtd, depositar ? m.carteira : m.poupanca.valor);
@@ -1781,7 +1826,7 @@ def(["enquete", "enquetedono"], G, async (c) => {
   const e = enqueteDe(c.jid);
   const sub = String(c.args[0] || "").toLowerCase();
   if (!c.texto.trim() || (["regras", "status", "ver"].includes(sub) && c.args.length === 1)) {
-    if (!e) return c.responder(`📊 Não há enquete aberta neste grupo.${c.ehDono ? `\n\nPara criar (só o dono):\n*${p}enquete Quem vence, Time A ou Time B? 35000*\nou com barras: *${p}enquete Quem vence? | Time A | Time B | 35000*` : ""}`);
+    if (!e) return c.responder(`📊 Não há enquete aberta neste grupo.${c.ehDono ? `\n\nPara criar (só o dono):\n*${p}enquete Quem vai ganhar, Lula ou Flávio? 35000*\nou com barras: *${p}enquete Quem vence? | Time A | Time B | 35000*` : ""}`);
     const fase = e.fase === "aberta" ? `⏳ Votação aberta por mais *${espera(e.fim - Date.now())}*` : "🔒 Votação encerrada · aguardando o dono informar o resultado com a fonte";
     return c.responder(`📊 *ENQUETE* — ${e.pergunta}\n\n${placarEnq(e)}\n\n👥 ${e.votos.length} voto(s) · ${fase}\n🏆 Prêmio total: ${moedas(e.total)}\n\n${regrasEnq(p, e)}`);
   }
@@ -1802,7 +1847,7 @@ def(["enquete", "enquetedono"], G, async (c) => {
     if (!(idx >= 0 && idx < e.opcoes.length)) return c.responder(`Diga qual opção venceu: *${p}enquete resultado 1 https://link-da-noticia [percentuais]*\n${e.opcoes.map((o, i) => `${i + 1}. ${o}`).join("\n")}`);
     let url;
     try { url = new URL(String(link || "")); } catch {}
-    if (!url || url.protocol !== "https:") return c.responder(`Mande o link (https) da notícia que confirma o resultado, para todos conferirem:\n*${p}enquete resultado ${idx + 1} https://site-da-noticia.com/...*`);
+    if (!url || url.protocol !== "https:") return c.responder(`Mande o link (https) da notícia que confirma o resultado, para todos conferirem:\n*${p}enquete resultado ${idx + 1} https://g1.globo.com/... Lula 52% · Flávio 48%*`);
     const certos = e.votos.filter((v) => v.opcao === idx).sort((a, b) => a.t - b.t || a.n - b.n);
     const premios = premiosEnq(e.total);
     const ganhadores = certos.slice(0, 3).map((v, i) => ({ ...v, premio: premios[i] }));
@@ -1821,7 +1866,7 @@ def(["enquete", "enquetedono"], G, async (c) => {
   }
   if (e) return c.responder(`Já tem uma enquete neste grupo (_${e.pergunta}_). Veja com *${p}enquete* ou cancele com *${p}enquete cancelar*.`);
   const lido = lerEnquete(c.texto);
-  if (lido.erro) return c.responder(`📊 Não entendi a enquete: ${lido.erro}.\n\nExemplos:\n*${p}enquete Quem vence, Time A ou Time B? 35000*\n*${p}enquete Quem vence o clássico? | Flamengo | Vasco | Empate | 35000*`);
+  if (lido.erro) return c.responder(`📊 Não entendi a enquete: ${lido.erro}.\n\nExemplos:\n*${p}enquete Quem vai ganhar, Lula ou Flávio? 35000*\n*${p}enquete Quem vence o clássico? | Flamengo | Vasco | Empate | 35000*`);
   const presentes = [...presentesNoGrupo(c.jid, c.meta)];
   const nova = { ...lido, fase: "aberta", criadaEm: Date.now(), fim: Date.now() + ENQ_DURACAO, por: chave(c.jid, c.autorJid), aptos: presentes, votos: [] };
   dados(c.jid).enquete = nova;
@@ -2034,7 +2079,7 @@ const tituloDe = (m) => {
 
 function posicaoNoGrupo(jid, id) {
   if (!ehGrupo(jid)) return null;
-  const lista = contasDoGrupo(jid).map(([n, m]) => [n, patrimonio(m)]).filter(([, p]) => p > 0).sort((a, b) => b[1] - a[1]);
+  const lista = contasDoGrupo(jid).map(([n, m]) => [n, Math.max(0, m.carteira || 0)]).filter(([, p]) => p > 0).sort((a, b) => b[1] - a[1]);
   const i = lista.findIndex(([n]) => n === chave(jid, id));
   return i >= 0 ? i + 1 : null;
 }
@@ -2558,16 +2603,16 @@ def(["comoganhar", "ganhar", "ganhos"], G, async (c) => {
 def(["rankrico", "toprico", "ricos", "rankeco"], G, async (c) => {
   if (!exigir(c)) return;
   const d = dados(c.jid);
-  const lista = contasDoGrupo(c.jid, c.meta).map(([n, m]) => [n, patrimonio(m)]).filter(([, p]) => p > 0).sort((a, b) => b[1] - a[1]);
-  if (!lista.length) return c.responder(`Ninguém tem moedas ainda. Comece com *${c.prefixo}diario* e *${c.prefixo}trabalhar*!`);
+  const lista = contasDoGrupo(c.jid, c.meta).map(([n, m]) => [n, Math.max(0, m.carteira || 0)]).filter(([, p]) => p > 0).sort((a, b) => b[1] - a[1]);
+  if (!lista.length) return c.responder(`Ninguém tem moedas na mão ainda. Comece com *${c.prefixo}diario* e *${c.prefixo}trabalhar*!`);
   const medalhas = ["🥇", "🥈", "🥉"];
   const top = lista.slice(0, 10);
   const minhaPos = lista.findIndex(([n]) => n === chave(c.jid, c.autorJid));
   const total = lista.reduce((s, [, p]) => s + p, 0);
   const podio = top.slice(0, 3).map(([n, p], i) => `${["👑", "💎", "🥉"][i]} *${["1º · O MAIS RICO", "2º · VICE-MILIONÁRIO", "3º · TERCEIRA FORTUNA"][i]}*\n   ${mk(c.jid, n)}${selo(c.jid, n)} — ${moedas(p)}\n   ${tituloDe(d.membros[n])}`).join("\n");
   const resto = top.slice(3).map(([n, p], i) => `${i + 4}. ${mk(c.jid, n)}${selo(c.jid, n)} — ${moedas(p)}`).join("\n");
-  return c.responder(`💎 *MAIS RICOS DO GRUPO*\n\n👑═══════ ✠ ═══════👑\n${podio}\n👑═══════ ✠ ═══════👑${resto ? `\n\n${resto}` : ""}\n\n` +
-    `🏦 Economia do grupo: *${moedas(total)}* (${lista.length} jogadores)${minhaPos >= 10 ? `\n📍 Você: ${minhaPos + 1}º` : ""}\n_Ranking entre grupos: ${c.prefixo}rankgrupos_`, top.map(([n]) => jidDe(c.jid, n)));
+  return c.responder(`💎 *MAIS RICOS DO GRUPO*\n_👛 Dinheiro na mão_\n\n👑═══════ ✠ ═══════👑\n${podio}\n👑═══════ ✠ ═══════👑${resto ? `\n\n${resto}` : ""}\n\n` +
+    `👛 Na mão do grupo: *${moedas(total)}* (${lista.length} jogadores)${minhaPos >= 10 ? `\n📍 Você: ${minhaPos + 1}º` : ""}\n_Ranking entre grupos: ${c.prefixo}rankgrupos_`, top.map(([n]) => jidDe(c.jid, n)));
 });
 
 const brData = (ms) => new Date(ms).toLocaleDateString("pt-BR");
@@ -2697,7 +2742,7 @@ def(["premium", "propriedadespremium", "lojapremium"], {}, async (c) => {
     lembrarNomeDoGrupo(c.jid, c.meta?.subject);
     return K.cobrar(c, { tipo: "premium", valor: it.reais, chave: `premium:${id}`, descricao: `${it.nome} (propriedade premium)`, dados: { id, jid: c.jid, autor: c.autorJid } });
   }
-  const linhas = premiumAtivas().map(([k, it]) => `${it.emoji} *${it.nome}* (${k})\n   💳 ${reais(it.reais)} · rende ${moedas(it.renda)}/h fixo${m.itens?.[k] ? ` · ✅ ${maxDe(k) > 1 ? `${m.itens[k]}/${maxDe(k)}` : "sua"}` : ""}`);
+  const linhas = premiumAtivas().map(([k, it]) => `${it.emoji} *${it.nome}* (${k})\n   💳 ${reais(it.reais)} · rende ${porDia(it.renda)} fixo${m.itens?.[k] ? ` · ✅ ${maxDe(k) > 1 ? `${m.itens[k]}/${maxDe(k)}` : "sua"}` : ""}`);
   return c.responder(`⭐ *PROPRIEDADES PREMIUM*\n_Compra única no Pix · renda fixa todo dia · crise não derruba · bônus da coleta nunca é negativo · é sua para sempre._\n\n${linhas.join("\n") || "_Nenhuma à venda agora._"}\n\n• *${p}premium comprar quiosque*\n• A renda cai junto no *${p}coletar*`);
 });
 import("./caixa.js").then((K) => K.registrarProduto("premium", {
@@ -2711,7 +2756,7 @@ import("./caixa.js").then((K) => K.registrarProduto("premium", {
     m.carteira += valor; m.ultimaColeta = Date.now();
     m.itens[d.id] = Math.min(maxDe(d.id), (m.itens[d.id] || 0) + 1);
     d.entregue = true; marcar(d.jid);
-    await K.falar(d.jid, `✅ *PAGAMENTO CONFIRMADO!*\n\n${marca(d.autor)} agora tem ${it?.emoji || "⭐"} *${it?.nome || d.id}*!\n💰 Rende *${moedas(it?.renda || 0)}/h* fixo, todo dia. Colete com *${CONFIG.prefixo}coletar*. 🎉`, { mentions: [d.autor] }).catch(() => {});
+    await K.falar(d.jid, `✅ *PAGAMENTO CONFIRMADO!*\n\n${marca(d.autor)} agora tem ${it?.emoji || "⭐"} *${it?.nome || d.id}*!\n💰 Rende *${porDia(it?.renda || 0)}* fixo, todo dia. Colete com *${CONFIG.prefixo}coletar*. 🎉`, { mentions: [d.autor] }).catch(() => {});
   }
 })).catch(() => {});
 
@@ -2837,8 +2882,8 @@ def(["djver"], { ...DJ, grupo: true }, async (c) => {
   const alvo = alvoMarcado(c) || c.autorJid;
   const m = conta(c.jid, alvo);
   const { valor, porHora } = rendaPendente(m);
-  const lin = Object.entries(m.itens || {}).filter(([, q]) => q > 0).map(([k, q]) => `• ${q}× ${nomeIt(k)} — ${moedas(rendaComFator(k) * q)}/h`);
-  return c.responder(`🏘️ *PROPRIEDADES* — ${marca(alvo)}\n\n${lin.join("\n") || "• nenhuma"}\n\n💰 ${moedas(porHora)}/h · para coletar: ${moedas(valor)}`, [alvo]);
+  const lin = Object.entries(m.itens || {}).filter(([, q]) => q > 0).map(([k, q]) => `• ${q}× ${nomeIt(k)} — ${porDia(rendaComFator(k) * q)}`);
+  return c.responder(`🏘️ *PROPRIEDADES* — ${marca(alvo)}\n\n${lin.join("\n") || "• nenhuma"}\n\n💰 ${porDia(porHora)} · para coletar: ${moedas(valor)}`, [alvo]);
 });
 def(["djcriarpremium"], DJ, async (c) => {
   const [id0, rs, rd, emoji, ...nome] = c.args;
@@ -2910,6 +2955,358 @@ def(["djconfig"], DJ, async (c) => {
   if (["juroHoras", "maxComum", "tetoDivida", "acumulaHoras", "cotacao"].includes(campo) && !(v > 0)) return c.responder("O valor precisa ser maior que 0.");
   AJ.cfg[campo] = v; salvarAjustes(); aplicarAjustes(); logDJ(c, `djconfig ${k}`, null, typeof v === "number" ? v : null, String(v));
   return c.responder(`✅ *${k}* = *${campo === "premium" ? (v ? "ligado" : "desligado") : fmt(v)}*.`);
+});
+
+const BC = {
+  limiteMin: 5_000, limiteMax: 5_000_000, limitePct: 0.3,
+  juroSaque: 0.10, prazoDias: 3, juroAtrasoDia: 0.05, carenciaDias: 3,
+};
+const soOficial = (c) => {
+  if (ehGrupoOficial(c.jid)) return true;
+  c.responder(`🏛️ Banco Central desligado neste grupo.`);
+  return false;
+};
+function atualizarCartao(m) {
+  const k = m.cartao;
+  if (!k || !k.fatura || !k.vence) return k;
+  const agora = Date.now();
+  if (agora > k.vence) {
+    const dias = Math.floor((agora - Math.max(k.vence, k.jurosEm || 0)) / DIA);
+    if (dias > 0) {
+      k.fatura = Math.floor(k.fatura * (1 + BC.juroAtrasoDia) ** dias);
+      k.jurosEm = Math.max(k.vence, k.jurosEm || 0) + dias * DIA;
+    }
+    if (agora > k.vence + BC.carenciaDias * DIA && k.fatura > 0) {
+      let resto = k.fatura;
+      const daMao = Math.min(Math.max(0, m.carteira), resto); m.carteira -= daMao; resto -= daMao;
+      const doBanco = Math.min(Math.max(0, m.banco || 0), resto); m.banco = (m.banco || 0) - doBanco; resto -= doBanco;
+      if (daMao + doBanco) anotar(m, "cobrança do Banco Central", -(daMao + doBanco), "sistema");
+      m.negativo = (m.negativo || 0) + resto;
+      k.fatura = 0; k.vence = 0; k.jurosEm = 0; k.bloqueado = true;
+    }
+  }
+  return k;
+}
+function cobrarNegativo(m) {
+  if (!(m.negativo > 0) || !(m.carteira > 0)) return 0;
+  const v = Math.min(m.carteira, m.negativo);
+  m.carteira -= v; m.negativo -= v;
+  if (!m.negativo && m.cartao) m.cartao.bloqueado = false;
+  anotar(m, "cobrança do Banco Central", -v, "sistema");
+  return v;
+}
+const limiteCartao = (m) => Math.max(BC.limiteMin, Math.min(BC.limiteMax, Math.floor(patrimonio(m) * BC.limitePct / 1000) * 1000));
+const linhaBC = (m) => (m.negativo > 0 ? `\n🔴 *Negativado:* -${fmt(m.negativo)} no Banco Central` : m.cartao?.fatura > 0 ? `\n💳 Fatura: ${moedas(m.cartao.fatura)}` : "");
+
+def(["bancocentral", "bcentral", "menubc"], G, async (c) => {
+  if (!soOficial(c) || !exigir(c)) return;
+  const p = c.prefixo;
+  return c.responder(`🏛️ *BANCO CENTRAL DA HINA*\n\n` +
+    `💳 *${p}cartao* — pedir/ver seu cartão\n💸 *${p}credito 1000* — usar o limite\n🧾 *${p}fatura* — ver a fatura\n✅ *${p}pagarfatura tudo* — pagar\n\n` +
+    `🕶️ *${p}mercadonegro* — facas, armas e bombas\n🎒 *${p}arsenal* — seus itens\n🚨 *${p}assaltarbc* — assaltar o Banco Central\n\n` +
+    `_Saque no crédito: +${BC.juroSaque * 100}% · Prazo: ${BC.prazoDias} dias · Atraso: +${BC.juroAtrasoDia * 100}%/dia_\n_Passou ${BC.carenciaDias} dias do vencimento: o banco cobra tudo e você fica negativado._`);
+});
+
+def(["cartao", "cartão", "meucartao"], G, async (c) => {
+  if (!soOficial(c) || !exigir(c)) return;
+  const m = conta(c.jid, c.autorJid);
+  if (!m.cartao) { m.cartao = { limite: limiteCartao(m), fatura: 0, vence: 0, desde: Date.now() }; marcar(c.jid); }
+  const k = atualizarCartao(m);
+  k.limite = Math.max(k.limite || 0, limiteCartao(m));
+  marcar(c.jid);
+  const livre = Math.max(0, k.limite - k.fatura);
+  return c.responder(`💳 *CARTÃO HINA* — ${marca(c.autorJid)}\n\n` +
+    `💎 Limite: *${moedas(k.limite)}*\n🟢 Disponível: *${moedas(k.bloqueado ? 0 : livre)}*\n🧾 Fatura: *${moedas(k.fatura)}*` +
+    `${k.vence ? `\n📅 Vence: ${new Date(k.vence).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}` : ""}` +
+    `${k.bloqueado ? `\n\n🔒 *Bloqueado* até quitar o negativo (-${fmt(m.negativo || 0)}).` : ""}`);
+});
+
+def(["credito", "crédito", "usarcredito"], G, async (c) => {
+  if (!soOficial(c) || !exigir(c)) return;
+  const m = conta(c.jid, c.autorJid);
+  if (!m.cartao) return c.responder(`💳 Peça seu cartão primeiro: *${c.prefixo}cartao*`);
+  const k = atualizarCartao(m);
+  if (k.bloqueado || m.negativo > 0) return c.responder(`🔒 Cartão bloqueado. Quite o negativo com *${c.prefixo}pagarfatura tudo*.`);
+  const livre = Math.max(0, Math.floor((k.limite - k.fatura) / (1 + BC.juroSaque)));
+  const v = lerValor(valoresDe(c)[0], livre);
+  if (!(v > 0)) return c.responder(`💸 Use: *${c.prefixo}credito 1000* (ou *tudo*)\nDisponível para saque: *${moedas(livre)}*`);
+  if (v > livre) return c.responder(`❌ Seu limite livre é *${moedas(livre)}*.`);
+  const custo = Math.ceil(v * (1 + BC.juroSaque));
+  m.carteira = Math.min(LIMITE, m.carteira + v);
+  k.fatura += custo;
+  if (!k.vence) k.vence = Date.now() + BC.prazoDias * DIA;
+  anotar(m, "crédito do Banco Central", v, "sistema");
+  marcar(c.jid);
+  return c.responder(`💸 +*${moedas(v)}* na mão.\n🧾 Fatura: *${moedas(k.fatura)}* · vence ${new Date(k.vence).toLocaleDateString("pt-BR")}`);
+});
+
+def(["fatura", "minhafatura"], G, async (c) => {
+  if (!soOficial(c) || !exigir(c)) return;
+  const m = conta(c.jid, c.autorJid);
+  const k = m.cartao ? atualizarCartao(m) : null;
+  marcar(c.jid);
+  if (m.negativo > 0) return c.responder(`🔴 Você está *negativado*: -${moedas(m.negativo)}\nTudo que entrar na sua mão vai pagando a dívida.\nPagar: *${c.prefixo}pagarfatura tudo*`);
+  if (!k?.fatura) return c.responder("✅ Nenhuma fatura em aberto.");
+  const atrasado = Date.now() > k.vence;
+  return c.responder(`🧾 Fatura: *${moedas(k.fatura)}*\n📅 ${atrasado ? "⚠️ Venceu em" : "Vence em"} ${new Date(k.vence).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}${atrasado ? `\n+${BC.juroAtrasoDia * 100}% ao dia de atraso` : ""}`);
+});
+
+def(["pagarfatura", "pagarcartao", "pagarbc"], G, async (c) => {
+  if (!soOficial(c) || !exigir(c)) return;
+  const m = conta(c.jid, c.autorJid);
+  const k = m.cartao ? atualizarCartao(m) : null;
+  const deve = (m.negativo || 0) + (k?.fatura || 0);
+  if (!deve) return c.responder("✅ Você não deve nada ao Banco Central.");
+  const v = Math.min(deve, lerValor(valoresDe(c)[0] || "tudo", Math.max(0, m.carteira)));
+  if (!(v > 0)) return c.responder(`💵 Você precisa de moedas na mão. Deve: *${moedas(deve)}*`);
+  m.carteira -= v;
+  let resto = v;
+  const neg = Math.min(resto, m.negativo || 0); m.negativo = (m.negativo || 0) - neg; resto -= neg;
+  if (k && resto) { k.fatura -= resto; if (k.fatura <= 0) { k.fatura = 0; k.vence = 0; k.jurosEm = 0; } }
+  if (k && !m.negativo) k.bloqueado = false;
+  anotar(m, "pagamento ao Banco Central", -v, "sistema");
+  marcar(c.jid);
+  const falta = (m.negativo || 0) + (k?.fatura || 0);
+  return c.responder(falta ? `✅ Pagou *${moedas(v)}*. Ainda deve *${moedas(falta)}*.` : `✅ Pagou *${moedas(v)}*. Tudo quitado! 💜`);
+});
+
+const NEGRO = {
+  faca: { nome: "Faca", emoji: "🔪", preco: 15_000, chance: 8, usos: 3, extra: 0 },
+  arma: { nome: "Arma", emoji: "🔫", preco: 80_000, chance: 15, usos: 2, extra: 0.1 },
+  bomba: { nome: "Bomba", emoji: "💣", preco: 300_000, chance: 25, usos: 1, extra: 0.25 },
+};
+const ASSALTO = { chanceBase: 15, chanceMax: 45, esperaH: 2, prisaoMin: 15 };
+const tetoAssalto = (total) => {
+  const t = Math.max(0, total);
+  if (t <= 500) return 5_000;
+  if (t >= 1_000_000) return Math.floor(2_000_000 * Math.sqrt(t / 1_000_000));
+  const mult = 10 * (t / 500) ** (Math.log(0.2) / Math.log(2000));
+  return Math.max(5_000, Math.floor(t * mult));
+};
+
+def(["mercadonegro", "mn", "blackmarket"], G, async (c) => {
+  if (!soOficial(c) || !exigir(c)) return;
+  const p = c.prefixo;
+  const linhas = Object.entries(NEGRO).map(([k, i]) => `${i.emoji} *${i.nome}* — ${moedas(i.preco)}\n   +${i.chance}% de chance · ${i.usos} uso(s)${i.extra ? ` · +${i.extra * 100}% no roubo` : ""}\n   ${p}comprarnegro ${k}`);
+  return c.responder(`🕶️ *MERCADO NEGRO*\n\n${linhas.join("\n\n")}\n\n_Use no ${p}assaltarbc_`);
+});
+
+def(["comprarnegro", "comprarmn"], G, async (c) => {
+  if (!soOficial(c) || !exigir(c)) return;
+  const m = conta(c.jid, c.autorJid);
+  const [k, q] = valoresDe(c).map((x) => x.toLowerCase());
+  const it = NEGRO[k];
+  if (!it) return c.responder(`🕶️ Itens: ${Object.keys(NEGRO).map((x) => `*${x}*`).join(", ")}\nEx.: *${c.prefixo}comprarnegro faca*`);
+  const qtd = Math.max(1, Math.min(10, Math.floor(Number(q) || 1)));
+  const custo = it.preco * qtd;
+  if (m.carteira < custo) return c.responder(`💵 Precisa de *${moedas(custo)}* na mão.`);
+  m.carteira -= custo;
+  m.arsenal ||= {};
+  m.arsenal[k] = (m.arsenal[k] || 0) + it.usos * qtd;
+  anotar(m, "mercado negro", -custo, "sistema");
+  marcar(c.jid);
+  return c.responder(`${it.emoji} Comprou *${qtd}x ${it.nome}*. Agora tem *${m.arsenal[k]}* uso(s).`);
+});
+
+def(["arsenal", "minhasarmas"], G, async (c) => {
+  if (!soOficial(c) || !exigir(c)) return;
+  const m = conta(c.jid, c.autorJid);
+  const l = Object.entries(m.arsenal || {}).filter(([, n]) => n > 0).map(([k, n]) => `${NEGRO[k]?.emoji || "•"} ${NEGRO[k]?.nome || k}: *${n}* uso(s)`);
+  return c.responder(l.length ? `🎒 *ARSENAL*\n\n${l.join("\n")}` : `🎒 Vazio. Veja o *${c.prefixo}mercadonegro*`);
+});
+
+def(["assaltarbc", "assaltarbancocentral", "roubarbc"], G, async (c) => {
+  if (!soOficial(c) || !exigir(c)) return;
+  const m = conta(c.jid, c.autorJid);
+  if (!exigirTermos(c, m)) return;
+  const agora = Date.now();
+  const falta = (m.assaltoBcEm || 0) + ASSALTO.esperaH * HORA - agora;
+  if (falta > 0) return c.responder(`🚨 A polícia está de olho. Tente em *${espera(falta)}*.`);
+  m.arsenal ||= {};
+  const pedido = (valoresDe(c)[0] || "").toLowerCase();
+  let usar = null;
+  if (pedido) {
+    if (!NEGRO[pedido]) return c.responder(`Use: *${c.prefixo}assaltarbc faca/arma/bomba* (ou sem nada)`);
+    if (!(m.arsenal[pedido] > 0)) return c.responder(`Você não tem ${NEGRO[pedido].emoji} ${NEGRO[pedido].nome}. *${c.prefixo}mercadonegro*`);
+    usar = pedido;
+  } else {
+    usar = ["bomba", "arma", "faca"].find((k) => m.arsenal[k] > 0) || null;
+  }
+  const it = usar ? NEGRO[usar] : null;
+  if (usar) m.arsenal[usar] -= 1;
+  m.assaltoBcEm = agora;
+  const chance = Math.min(ASSALTO.chanceMax, ASSALTO.chanceBase + (it?.chance || 0));
+  const total = Math.max(0, m.carteira) + Math.max(0, m.banco || 0);
+  const teto = tetoAssalto(total);
+  const comItem = it ? ` com ${it.emoji}` : "";
+  if (aleatorio() * 100 < chance) {
+    const v = Math.min(LIMITE - m.carteira, Math.floor(teto * (0.4 + aleatorio() * 0.6) * (1 + (it?.extra || 0))));
+    m.carteira += v;
+    anotar(m, "assalto ao Banco Central", v, "sistema");
+    marcar(c.jid);
+    return c.responder(`🚨💰 ${marca(c.autorJid)} assaltou o *Banco Central*${comItem} e fugiu com *${moedas(v)}*!`, [c.autorJid]);
+  }
+  m.presoAte = agora + ASSALTO.prisaoMin * MIN;
+  marcar(c.jid);
+  return c.responder(`🚔 ${marca(c.autorJid)} tentou assaltar o Banco Central${comItem} e foi *preso*!\n⛓️ ${ASSALTO.prisaoMin} min sem jogar o RPG.`, [c.autorJid]);
+});
+
+const CARREIRAS = {
+  policia: { nome: "Polícia", emoji: "👮", preco: 100_000, dias: 7, poder: "prender procurados" },
+  juiz: { nome: "Juiz", emoji: "⚖️", preco: 300_000, dias: 7, poder: "condenar e soltar presos" },
+  bope: { nome: "BOPE", emoji: "💀", preco: 1_000_000, dias: 7, poder: "abater procurados" },
+};
+const CRIME_CMDS = new Set(["crime", "roubarbanco", "assalto", "roubar", "furtar", "roubarpoupanca", "roubarpoupança", "assaltarpoupanca", "assaltarbc", "assaltarbancocentral", "roubarbc", "assassino", "assassinodealuguel", "matador", "contratar"]);
+const PROCURADO_MIN = 60, ABATIDO_MIN = 10, PRISAO_POLICIA_MIN = 15, CONDENAR_MIN = 30, PENA_MAX_MIN = 120;
+const temCarreira = (c, m, k) => Boolean(c.ehDono || (m.carreira?.tipo === k && m.carreira.ate > Date.now()));
+let _papelDe = null;
+import("./dono.js").then((d) => { _papelDe = d.papelDe; }).catch(() => {});
+const ehDonoAlvo = (jid) => { try { return _papelDe?.([usuario(jid), jid]) === "dono"; } catch { return false; } };
+const procurado = (m) => m.procuradoAte > Date.now();
+const preso = (m) => m.presoAte > Date.now();
+const DESCANSO_CARREIRA_MIN = 20;
+function emDescanso(c, m) {
+  if (c.ehDono) return false;
+  const falta = (m.descansoAte || 0) - Date.now();
+  if (falta <= 0) return false;
+  if (!m.descansoAvisado) { m.descansoAvisado = true; marcar(c.jid); c.responder(`😮‍💨 Você está descansando da última ação. Volta em *${espera(falta)}*.`); }
+  return true;
+}
+function esperaCarreira(c, m) {
+  if (!c.ehDono) { m.descansoAte = Date.now() + DESCANSO_CARREIRA_MIN * MIN; m.descansoAvisado = false; }
+  return false;
+}
+function alvoCarreira(c) {
+  const alvo = alvoMarcado(c);
+  if (!alvo) { c.responder(`Marque alguém: *${c.prefixo}${c.cmd} @pessoa*`); return null; }
+  if (alvo === c.autorJid) { c.responder("🙃 Em você mesmo não dá."); return null; }
+  if (ehDonoAlvo(alvo)) { c.responder("👑 O dono está acima da lei do RPG. 😌"); return null; }
+  return alvo;
+}
+
+def(["carreiras", "empregos", "carreira", "minhacarreira"], G, async (c) => {
+  if (!exigir(c)) return;
+  const m = conta(c.jid, c.autorJid);
+  const p = c.prefixo;
+  const escolha = String(c.args[0] || "").toLowerCase().replace("í", "i");
+  if (escolha && CARREIRAS[escolha]) {
+    const k = CARREIRAS[escolha];
+    if (c.ehDono) return c.responder("👑 Você é o dono: já tem todas as carreiras.");
+    if (m.carreira?.tipo === escolha && m.carreira.ate > Date.now()) {
+      if (m.carteira < k.preco) return c.responder(`💵 Renovar custa *${moedas(k.preco)}* na mão.`);
+      m.carteira -= k.preco; m.carreira.ate += k.dias * DIA;
+    } else {
+      if (m.carteira < k.preco) return c.responder(`💵 ${k.emoji} ${k.nome} custa *${moedas(k.preco)}* na mão.`);
+      m.carteira -= k.preco; m.carreira = { tipo: escolha, ate: Date.now() + k.dias * DIA };
+    }
+    anotar(m, `carreira ${k.nome}`, -k.preco, "sistema");
+    paraCaixa(c.jid, k.preco, "carreira");
+    marcar(c.jid);
+    return c.responder(`${k.emoji} Agora você é *${k.nome}* até ${new Date(m.carreira.ate).toLocaleDateString("pt-BR")}!\nPoder: ${k.poder}.`);
+  }
+  const atual = c.ehDono ? "👑 Dono: todas as carreiras" : m.carreira?.ate > Date.now() ? `${CARREIRAS[m.carreira.tipo].emoji} ${CARREIRAS[m.carreira.tipo].nome} até ${new Date(m.carreira.ate).toLocaleDateString("pt-BR")}` : "nenhuma";
+  const lista = Object.entries(CARREIRAS).map(([k, v]) => `${v.emoji} *${v.nome}* — ${moedas(v.preco)} / ${v.dias} dias\n   ${v.poder} · *${p}carreira ${k}*`).join("\n\n");
+  return c.responder(`💼 *CARREIRAS*\nSua: ${atual}\n\n${lista}\n\n` +
+    `👮 *${p}prender @pessoa* · ⚖️ *${p}condenar @pessoa* · *${p}soltar @pessoa*\n💀 *${p}abater @pessoa* · 🚨 *${p}procurados* · 💸 *${p}fianca*\n_Procurado = quem cometeu crime na última hora._`);
+});
+
+def(["procurados", "foragidos"], G, async (c) => {
+  if (!exigir(c)) return;
+  const l = contasDoGrupo(c.jid, c.meta).filter(([, m]) => procurado(m) || preso(m));
+  if (!l.length) return c.responder("😇 Ninguém procurado nem preso agora.");
+  const linhas = l.map(([n, m]) => `${preso(m) ? `⛓️ preso · sai em ${espera(m.presoAte - Date.now())}` : `🚨 procurado · ${espera(m.procuradoAte - Date.now())}`} — ${mk(c.jid, n)}`);
+  return c.responder(`🚔 *PROCURADOS E PRESOS*\n\n${linhas.join("\n")}`, l.map(([n]) => jidDe(c.jid, n)));
+});
+
+def(["prender", "algemar"], G, async (c) => {
+  if (!exigir(c)) return;
+  const m = conta(c.jid, c.autorJid);
+  if (!temCarreira(c, m, "policia")) return c.responder(`👮 Só a *Polícia* prende. Veja *${c.prefixo}carreiras*`);
+  if (emDescanso(c, m)) return;
+  const alvo = alvoCarreira(c); if (!alvo) return;
+  const v = conta(c.jid, alvo);
+  if (preso(v)) return c.responder(`${marca(alvo)} já está preso.`, [alvo]);
+  if (!procurado(v) && !c.ehDono) return c.responder(`${marca(alvo)} não está sendo procurado. Só prende quem cometeu crime na última hora.`, [alvo]);
+  if (esperaCarreira(c, m)) return;
+  if (!c.ehDono && aleatorio() > 0.7) { marcar(c.jid); return c.responder(`🏃 ${marca(alvo)} fugiu da ${marca(c.autorJid)}!`, [alvo, c.autorJid]); }
+  const recompensa = Math.min(5_000_000, Math.floor(Math.max(0, v.carteira) * 0.10));
+  v.carteira -= recompensa; m.carteira = Math.min(LIMITE, m.carteira + recompensa);
+  v.presoAte = Date.now() + PRISAO_POLICIA_MIN * MIN; v.procuradoAte = 0;
+  if (recompensa) { anotar(v, "preso pela polícia", -recompensa, c.autorJid); anotar(m, "recompensa da prisão", recompensa, alvo); }
+  marcar(c.jid);
+  return c.responder(`👮🚔 ${marca(c.autorJid)} prendeu ${marca(alvo)}!\n⛓️ ${PRISAO_POLICIA_MIN} min na cadeia${recompensa ? ` · 💰 recompensa: *${moedas(recompensa)}*` : ""}`, [c.autorJid, alvo]);
+});
+
+def(["condenar", "sentenciar"], G, async (c) => {
+  if (!exigir(c)) return;
+  const m = conta(c.jid, c.autorJid);
+  if (!temCarreira(c, m, "juiz")) return c.responder(`⚖️ Só o *Juiz* condena. Veja *${c.prefixo}carreiras*`);
+  if (emDescanso(c, m)) return;
+  const alvo = alvoCarreira(c); if (!alvo) return;
+  const v = conta(c.jid, alvo);
+  if (!preso(v)) return c.responder(`${marca(alvo)} não está preso. O juiz só condena quem está na cadeia.`, [alvo]);
+  if (esperaCarreira(c, m)) return;
+  v.presoAte = Math.min(Date.now() + PENA_MAX_MIN * MIN, v.presoAte + CONDENAR_MIN * MIN);
+  const multa = Math.floor(Math.max(0, v.carteira) * 0.15);
+  const parteJuiz = Math.floor(multa / 2);
+  v.carteira -= multa; m.carteira = Math.min(LIMITE, m.carteira + parteJuiz);
+  if (multa) { anotar(v, "multa do juiz", -multa, c.autorJid); anotar(m, "honorários de sentença", parteJuiz, alvo); paraCaixa(c.jid, multa - parteJuiz, "juiz"); }
+  marcar(c.jid);
+  return c.responder(`⚖️🔨 ${marca(c.autorJid)} condenou ${marca(alvo)}!\n⛓️ +${CONDENAR_MIN} min de pena (sai em ${espera(v.presoAte - Date.now())})${multa ? `\n💸 Multa: *${moedas(multa)}*` : ""}`, [c.autorJid, alvo]);
+});
+
+def(["soltar", "absolver"], G, async (c) => {
+  if (!exigir(c)) return;
+  const m = conta(c.jid, c.autorJid);
+  if (!temCarreira(c, m, "juiz")) return c.responder(`⚖️ Só o *Juiz* solta presos. Veja *${c.prefixo}carreiras*`);
+  if (emDescanso(c, m)) return;
+  const alvo = alvoMarcado(c);
+  if (!alvo) return c.responder(`Marque alguém: *${c.prefixo}soltar @pessoa*`);
+  const v = conta(c.jid, alvo);
+  if (!preso(v)) return c.responder(`${marca(alvo)} não está preso.`, [alvo]);
+  if (esperaCarreira(c, m)) return;
+  v.presoAte = 0;
+  marcar(c.jid);
+  return c.responder(`⚖️🕊️ ${marca(c.autorJid)} absolveu ${marca(alvo)}. Está livre!`, [c.autorJid, alvo]);
+});
+
+def(["abater", "bope"], G, async (c) => {
+  if (!exigir(c)) return;
+  const m = conta(c.jid, c.autorJid);
+  if (!temCarreira(c, m, "bope")) return c.responder(`💀 Só o *BOPE* abate. Veja *${c.prefixo}carreiras*`);
+  if (emDescanso(c, m)) return;
+  const alvo = alvoCarreira(c); if (!alvo) return;
+  const v = conta(c.jid, alvo);
+  if (v.mortoAte > Date.now()) return c.responder(`${marca(alvo)} já foi abatido.`, [alvo]);
+  if (!procurado(v) && !c.ehDono) return c.responder(`${marca(alvo)} não está sendo procurado. O BOPE só age contra quem cometeu crime na última hora.`, [alvo]);
+  if (esperaCarreira(c, m)) return;
+  if (!c.ehDono && aleatorio() > 0.6) { marcar(c.jid); return c.responder(`💨 ${marca(alvo)} escapou da operação do BOPE!`, [alvo]); }
+  const perda = Math.floor(Math.max(0, v.carteira) * 0.25);
+  const parte = Math.floor(perda / 2);
+  v.carteira -= perda; m.carteira = Math.min(LIMITE, m.carteira + parte);
+  v.mortoAte = Date.now() + ABATIDO_MIN * MIN; v.procuradoAte = 0;
+  if (perda) { anotar(v, "abatido pelo BOPE", -perda, c.autorJid); anotar(m, "operação do BOPE", parte, alvo); paraCaixa(c.jid, perda - parte, "bope"); }
+  marcar(c.jid);
+  return c.responder(`💀🎯 O BOPE ${marca(c.autorJid)} abateu ${marca(alvo)} (no faz de conta)!\n⏳ ${ABATIDO_MIN} min fora do RPG${perda ? ` · deixou cair *${moedas(perda)}*` : ""}`, [c.autorJid, alvo]);
+});
+
+def(["fianca", "fiança", "pagarfianca"], G, async (c) => {
+  if (!cfgRpg(c.jid).economia) return c.responder(`🎮 RPG desligado aqui.`);
+  const alvo = alvoMarcado(c) || c.autorJid;
+  const v = conta(c.jid, alvo);
+  if (!preso(v)) return c.responder(alvo === c.autorJid ? "😇 Você não está preso." : `${marca(alvo)} não está preso.`, [alvo]);
+  const pagador = conta(c.jid, c.autorJid);
+  if (alvo !== c.autorJid && preso(pagador)) return c.responder("⛓️ Preso não paga fiança dos outros.");
+  const valor = Math.max(10_000, Math.floor((Math.max(0, v.carteira) + Math.max(0, v.banco || 0)) * 0.15));
+  const tem = Math.max(0, pagador.carteira) + Math.max(0, pagador.banco || 0);
+  if (tem < valor) return c.responder(`💸 A fiança é *${moedas(valor)}* e ${alvo === c.autorJid ? "você" : "o pagador"} não tem isso (mão + banco).`);
+  const daMao = Math.min(Math.max(0, pagador.carteira), valor);
+  pagador.carteira -= daMao; pagador.banco -= valor - daMao;
+  v.presoAte = 0;
+  anotar(pagador, "fiança", -valor, alvo);
+  paraCaixa(c.jid, valor, "fianca");
+  marcar(c.jid);
+  return c.responder(`💸🔓 ${alvo === c.autorJid ? `${marca(alvo)} pagou a fiança` : `${marca(c.autorJid)} pagou a fiança de ${marca(alvo)}`} (*${moedas(valor)}*). Está livre!`, [alvo, c.autorJid]);
 });
 
 export const COMANDOS_ECONOMIA = C;

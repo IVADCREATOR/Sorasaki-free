@@ -19,7 +19,7 @@ Feito por **IVAD**, desenvolvedor oficial da Sorasaki.
 - 🎮 RPG completo com cassino e bolsa
 - 💎 Aluguel com Pix (opcional)
 - 🎨 Tudo personalizável pelo dono
-- 📱 Termux, Square Cloud e VPS
+- 📱 Termux, PC (Windows), Square Cloud e VPS
 
 <br clear="right">
 
@@ -61,6 +61,24 @@ Economia, diário, trabalho, crime, banco, roubo, empréstimos, cassino com 15 j
 #menudonojogos   → controle total do dono
 ```
 
+#### 🆕 Novidades do RPG
+| | |
+|---|---|
+| 🏛️ **Banco Central** | Cartão com limite, crédito na hora, fatura com juros e nome sujo para quem não paga |
+| 🕶️ **Mercado negro** | Faca, arma e bomba para o assalto ao Banco Central |
+| 👮 **Carreiras** | Polícia, juiz e BOPE: prender, condenar, soltar e abater procurados |
+| ⛓️ **Prisão e fiança** | Quem comete crime vira procurado; preso fica 15 min ou paga a fiança |
+| 🌆 **Impérios e terrenos** | 15 impérios e 7 terrenos novos, com renda por dia |
+| 💎 **Rank justo** | O rank dos mais ricos conta só o dinheiro na mão |
+| ⏳ **Descansos** | Apostas a cada 10 s, brincadeiras a cada 20 s e 20 min de descanso nas carreiras |
+
+```
+#bancocentral    → cartão, crédito e fatura
+#mercadonegro    → itens para o assalto
+#carreiras       → polícia, juiz e BOPE
+#procurados      → quem está procurado ou preso
+```
+
 - 🔘 Menus com **botões** (se o WhatsApp não mostrar, ela manda em texto)
 - 🔑 Sem API, sem chave, sem nada pago: funciona sozinha
 - 📱 Conecta por **código de pareamento** ou **QR Code**
@@ -88,6 +106,21 @@ Digite o número do bot (com 55 e DDD) e use o código que aparecer em
 
 O `squarecloud.app` já vem pronto.
 
+### 💻 PC (Windows)
+1. Instale o **Node.js 20 LTS** em [nodejs.org](https://nodejs.org) (Next, Next, Concluir).
+2. Instale o **Git** em [git-scm.com](https://git-scm.com/download/win).
+3. Abra o **Prompt de Comando** (tecla Windows, digite `cmd`) e rode:
+```bash
+git clone https://github.com/IVADCREATOR/Sorasaki-free
+cd Sorasaki-free
+npm install
+npm start
+```
+4. Digite o número do bot (com 55 e DDD) e use o código em **WhatsApp › Aparelhos conectados**.
+
+Sem Git: baixe pelo botão **Code › Download ZIP**, extraia, abra a pasta, digite `cmd` na barra de endereço e rode `npm install` e `npm start`.
+Deixe o PC ligado e sem hibernar enquanto a bot estiver rodando. Para religar: abra o `cmd` na pasta e rode `npm start`.
+
 ### 🖥️ Bronxys, Discloud ou qualquer VPS
 - Arquivo principal: `index.js`
 - Comando de início: `npm start`
@@ -100,7 +133,7 @@ O `squarecloud.app` já vem pronto.
 
 Suas configurações, sessão e dados ficam salvos: atualizar **não apaga nada**.
 
-### 📱 Termux, 🖥️ VPS e Bronxys (pelo console)
+### 📱 Termux, 💻 PC, 🖥️ VPS e Bronxys (pelo console)
 Pare a bot e rode dentro da pasta dela:
 ```bash
 npm run atualizar

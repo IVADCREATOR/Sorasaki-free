@@ -14,6 +14,14 @@ export const esquecerGrupo = (jid) => metas.delete(jid);
 
 export const metaEmCache = (jid) => metas.get(jid)?.meta;
 
+const APOSTAS_CMDS = new Set(["apostar", "aposta", "bet", "cassino", "caixas", "caixamisteriosa", "abrircaixa", "lootbox"]);
+const recargas = new Map();
+function recargaDe(def) {
+  if (def.nomes.some((n) => APOSTAS_CMDS.has(n))) return { tipo: "apostas", ms: 10_000, nome: "as apostas" };
+  if (def.categoria === "brincadeiras") return { tipo: "brincadeiras", ms: 20_000, nome: "as brincadeiras" };
+  return null;
+}
+
 export async function metaDoGrupo(sock, jid) {
   const c = metas.get(jid);
   if (c && Date.now() - c.em < 60_000) return c.meta;
@@ -195,6 +203,19 @@ export async function aoReceber(sock, msg) {
   if (def.admin && !isAdmin) return contexto.reply(t("soAdmin"));
   if (def.botAdmin && !isBotAdmin) return contexto.reply(t("botAdmin"));
   if (isGroup && g.soadm && !isAdmin && !def.livre) return contexto.reply(t("soAdmModo"));
+  const r = recargaDe(def);
+  if (r && !isAdmin && !isDono) {
+    const k = `${jid}|${autor}|${r.tipo}`;
+    const agora = Date.now();
+    const st = recargas.get(k);
+    if (st && st.ate > agora) {
+      if (st.avisou) return;
+      st.avisou = true;
+      return contexto.reply(`⏳ Espere *${Math.ceil((st.ate - agora) / 1000)}s* para usar ${r.nome} de novo.`);
+    }
+    recargas.set(k, { ate: agora + r.ms, avisou: false });
+    if (recargas.size > 5000) for (const [kk, v] of recargas) if (v.ate < agora) recargas.delete(kk);
+  }
 
   try {
     await def.run(contexto);

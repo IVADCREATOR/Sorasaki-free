@@ -54,6 +54,14 @@ function textoMenu(c) {
 ┃ ${p}depositar valor 💎 _(só VIP)_ · ${p}sacar valor — guardar/tirar do banco
 ┃ ${p}senhacriar · ${p}senhatrocar — senha do banco (no privado)${cfg.roubo ? `\n┃ ${p}roubar @ · ${p}assaltarbanco @ senha\n┃ ${p}assassino @ — assassino de aluguel` : ""}${cfg.emprestimo ? `\n┃ ${p}emprestar @ valor juros · ${p}pediremprestimo @ valor juros\n┃ ${p}emprestimo · ${p}pagardivida · ${p}perdoardivida @\n┃ ${p}aceitaremprestimo · ${p}recusaremprestimo · ${p}contraproposta` : ""}
 
+👮 *CARREIRAS*
+┃ ${p}carreiras · ${p}prender · ${p}condenar · ${p}soltar
+┃ ${p}abater · ${p}procurados · ${p}fianca
+
+🏛️ *BANCO CENTRAL*
+┃ ${p}bancocentral · ${p}cartao · ${p}credito · ${p}fatura
+┃ ${p}mercadonegro · ${p}arsenal · ${p}assaltarbc
+
 🎯 *GANHAR JOGANDO* (sem apostar nada)
 ┃ ${p}comoganhar — todos os jeitos de ganhar
 ┃ ${p}desafio fácil/médio/difícil · ${p}r resposta
@@ -70,7 +78,7 @@ function textoMenu(c) {
 ┃ ${p}historico SORA3 · ${p}comparar SORA3 HINA4
 
 🐷 *INVESTIMENTOS* ${cfg.investir ? "" : "(desligados)"}
-┃ ${p}poupanca — 0,5% ao dia, sem risco
+┃ ${p}poupanca — 0,2% ao dia, sem risco
 ┃ ${p}cdb — prazo de 7, 15 ou 30 dias
 ┃ ${p}dividendos · ${p}investimentos
 
@@ -143,6 +151,8 @@ def(["menurpg", "rpg", "menueconomia", "economia"], G, async (c) => {
         linha(c, "💼 Trabalhar", "trabalhar", "Ganha moedas a cada 20 min"),
         linha(c, "🦹 Crime", "crime", `Arriscado: até ${moedas(tetoGanho("crime"))} ou paga multa`),
         linha(c, "🏦 Banco", "banco", "Guarde para não ser roubado (precisa de senha)"),
+        linha(c, "🏛️ Banco Central", "bancocentral", "Cartão, crédito e mercado negro"),
+        linha(c, "👮 Carreiras", "carreiras", "Polícia, juiz e BOPE: prenda, condene e abata"),
         linha(c, "🔐 Criar senha do banco", "senhacriar", "No privado da Hina"),
         linha(c, "🔁 Trocar senha do banco", "senhatrocar", "No privado da Hina"),
         ...(cfg.roubo ? [linha(c, "🏦🔓 Assaltar banco", "assaltarbanco", "Descubra a senha e leve 10% a 40%"), linha(c, "🔪 Assassino de aluguel", "assassino", "35% acerta · se for pego, multa de 1 a 5 mil")] : []),
@@ -157,8 +167,8 @@ def(["menurpg", "rpg", "menueconomia", "economia"], G, async (c) => {
       { title: "🎰 APOSTAS E BOLSA", options: [
         ...(cfg.apostas ? [linha(c, "🎰 Cassino", "menuapostas", "15 jogos: slot, roleta, minas, pênalti e mais"), linha(c, "🎁 Caixas misteriosas", "caixas", "De 10 mil a 3 mi: itens, moedas, propriedades e premium")] : []),
         ...(cfg.bolsa ? [linha(c, "📈 Menu de ações", "menuacoes", "Empresas, preços, riscos e comandos"), linha(c, "📈 Bolsa Sora", "bolsa", "Ações fictícias que sobem e descem"), linha(c, "📊 Minhas ações", "minhasacoes", "Lucro e prejuízo")] : []),
-        ...(cfg.loja ? [linha(c, "🏘️ Propriedades", "loja", "Compre e receba renda por hora"), linha(c, "💰 Coletar renda", "coletar", "Pega o que suas propriedades renderam"), linha(c, "⭐ Premium", "premium", "Renda fixa, nunca dá prejuízo (Pix)")] : []),
-        ...(cfg.investir ? [linha(c, "🐷 Poupança", "poupanca", "0,5% ao dia, sem risco"), linha(c, "🏛️ CDB", "cdb", "Ganho garantido com prazo"), linha(c, "💼 Meus investimentos", "investimentos", "Poupança, CDB, ações e dividendos")] : [])
+        ...(cfg.loja ? [linha(c, "🏘️ Propriedades", "loja", "Compre e receba renda todo dia"), linha(c, "💰 Coletar renda", "coletar", "Pega o que suas propriedades renderam"), linha(c, "⭐ Premium", "premium", "Renda fixa, nunca dá prejuízo (Pix)")] : []),
+        ...(cfg.investir ? [linha(c, "🐷 Poupança", "poupanca", "0,2% ao dia, sem risco"), linha(c, "🏛️ CDB", "cdb", "Ganho garantido com prazo"), linha(c, "💼 Meus investimentos", "investimentos", "Poupança, CDB, ações e dividendos")] : [])
       ] },
       { title: "🎨 PERSONALIZAÇÃO", options: [
         linha(c, "🖼️ Molduras do perfil", "molduras", "Compra única, fica pra sempre"),

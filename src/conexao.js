@@ -14,6 +14,8 @@ import { aoMudarParticipantes } from "./eventos.js";
 const PASTA_SESSAO = path.resolve("sessao");
 const silencioso = pino({ level: "silent" });
 let tentativas = 0;
+let numeroPareamento = "";
+let codigoPedido = false;
 let vigia = null;
 const guardadas = new Map();
 function guardar(id, m) {
@@ -34,6 +36,19 @@ export async function iniciar() {
   let versao;
   try { versao = (await fetchLatestBaileysVersion()).version; } catch {}
 
+  let usandoCodigo = false;
+  let pedindo = false;
+  if (!state.creds.registered) {
+    let numero = numeroPareamento || soNumero(cfg().numeroBot);
+    if (!numero && process.stdin.isTTY) numero = soNumero(await perguntar("📱 Número do bot com DDI e DDD (ex: 5511999999999), ou Enter para usar QR Code: "));
+    if (numero && (numero.length === 10 || numero.length === 11)) numero = `55${numero}`;
+    if (numero && (numero.length < 12 || numero.length > 13)) {
+      console.log(`⚠️ Número inválido: ${numero}. Use 55 + DDD + número, ex: 5511999999999`);
+      numero = "";
+    }
+    numeroPareamento = numero;
+    usandoCodigo = Boolean(numero);
+  }
   const sock = makeWASocket({
     ...(versao ? { version: versao } : {}),
     logger: silencioso,
@@ -50,27 +65,25 @@ export async function iniciar() {
     cachedGroupMetadata: async (jid) => metaEmCache(jid),
   });
 
-  let usandoCodigo = false;
-  if (!state.creds.registered) {
-    let numero = soNumero(cfg().numeroBot);
-    if (!numero && process.stdin.isTTY) numero = soNumero(await perguntar("📱 Número do bot com DDI e DDD (ex: 5511999999999), ou Enter para usar QR Code: "));
-    if (numero && (numero.length === 10 || numero.length === 11)) numero = `55${numero}`;
-    if (numero && (numero.length < 12 || numero.length > 13)) {
-      console.log(`⚠️ Número inválido: ${numero}. Use 55 + DDD + número, ex: 5511999999999`);
-      numero = "";
+  const pedirCodigo = async () => {
+    if (!usandoCodigo || pedindo || codigoPedido || state.creds.registered) return;
+    pedindo = true;
+    console.log(`📲 Gerando código para +${numeroPareamento}...`);
+    for (let i = 1; i <= 3; i++) {
+      try {
+        const codigo = await sock.requestPairingCode(numeroPareamento);
+        codigoPedido = true;
+        console.log(`\n🔑 Código de pareamento: ${codigo?.match(/.{1,4}/g)?.join("-") || codigo}`);
+        console.log("No WhatsApp: Aparelhos conectados > Conectar aparelho > Conectar com número de telefone");
+        console.log("O código vale pouco tempo: digite rápido.\n");
+        break;
+      } catch (e) {
+        console.log(`⚠️ Tentativa ${i}/3 falhou (${e.message}).`);
+        await new Promise((r) => setTimeout(r, 3000 * i));
+      }
     }
-    if (numero) {
-      usandoCodigo = true;
-      console.log(`📲 Gerando código para +${numero}...`);
-      setTimeout(async () => {
-        try {
-          const codigo = await sock.requestPairingCode(numero);
-          console.log(`\n🔑 Código de pareamento: ${codigo?.match(/.{1,4}/g)?.join("-") || codigo}`);
-          console.log("No WhatsApp: Aparelhos conectados > Conectar aparelho > Conectar com número de telefone\n");
-        } catch (e) { console.error("[conexão] não consegui gerar o código:", e.message); }
-      }, 3000);
-    }
-  }
+    pedindo = false;
+  };
 
   globalThis.__sorasakiSock = sock;
   const enviar = sock.sendMessage.bind(sock);
@@ -81,12 +94,14 @@ export async function iniciar() {
   sock.ev.on("creds.update", saveCreds);
 
   sock.ev.on("connection.update", async ({ connection, lastDisconnect, qr }) => {
+    if (qr && usandoCodigo) pedirCodigo();
     if (qr && !usandoCodigo) {
       try { (await import("qrcode-terminal")).default.generate(qr, { small: true }); } catch {}
       console.log("📷 Escaneie o QR Code acima (ou coloque o número em numeroBot no config.json para usar código).");
     }
     if (connection === "open") {
       tentativas = 0;
+      codigoPedido = false;
       clearInterval(vigia);
       vigia = iniciarVigia(sock, t);
       iniciarPagamentos(sock);
@@ -103,6 +118,7 @@ export async function iniciar() {
         console.log("⚠️ Outra conexão abriu com este número. Encerrando.");
         process.exit(1);
       }
+      if (!state.creds.registered) codigoPedido = false;
       tentativas++;
       const espera = Math.min(30_000, 2_000 * tentativas);
       console.log(`🔄 Conexão caiu (${codigo || "?"}). Reconectando em ${espera / 1000}s...`);

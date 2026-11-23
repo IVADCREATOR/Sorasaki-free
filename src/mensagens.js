@@ -1,5 +1,5 @@
 import { normalizeMessageContent } from "baileys";
-import { cfg, ehDono, soNumero } from "./lib/config.js";
+import { cfg, ehDono, soNumero, prefixoUsado, prefixosExtras } from "./lib/config.js";
 import { grupo, salvarGrupo } from "./lib/banco.js";
 import { t } from "./lib/textos.js";
 import { respostaDeBotao } from "./lib/botoes.js";
@@ -96,6 +96,7 @@ export async function aoReceber(sock, msg) {
   const texto = textoDa(msg).trim();
   const c = cfg();
   const prefixo = c.prefixo || "#";
+  const usado = prefixoUsado(texto);
   let isDono = msg.key.fromMe || ehDono(autor, autorAlt);
 
   let meta = null, isAdmin = false, isBotAdmin = false, g = null;
@@ -152,7 +153,7 @@ export async function aoReceber(sock, msg) {
   if (isGroup && ativo && !msg.key.fromMe) {
     const bruto = normalizeMessageContent(msg.message) || {};
     if (bruto.pollUpdateMessage) return votoEnquete(sock, msg, bruto);
-    const nomeCmd = texto.startsWith(prefixo) ? texto.slice(prefixo.length).trim().split(/\s+/)[0].toLowerCase() : "";
+    const nomeCmd = usado ? texto.slice(usado.length).trim().split(/\s+/)[0].toLowerCase() : "";
     const consumiu = await convivencia({
       sock, msg, jid, autor, nome: msg.pushName || "", texto, meta, prefixo,
       ehComando: Boolean(nomeCmd && COMANDOS.has(nomeCmd)),
@@ -161,9 +162,9 @@ export async function aoReceber(sock, msg) {
     if (consumiu) return;
   }
 
-  if (msg.key.fromMe && !texto.startsWith(prefixo)) return;
-  if (!texto.startsWith(prefixo)) return;
-  const [nome, ...args] = texto.slice(prefixo.length).trim().split(/\s+/);
+  if (!usado && /^prefixo$/i.test(texto) && !msg.key.fromMe && (!isGroup || ativo)) return sock.sendMessage(jid, { text: `🔣 Meu prefixo é *${prefixo}*${c.multiprefixo ? `\nTambém aceito: ${prefixosExtras().join(" ")}` : ""}\nEx: ${prefixo}menu` }, { quoted: msg });
+  if (!usado) return;
+  const [nome, ...args] = texto.slice(usado.length).trim().split(/\s+/);
   const cmd = (nome || "").toLowerCase();
   if (!cmd) return;
   const def = COMANDOS.get(cmd);

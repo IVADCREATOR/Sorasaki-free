@@ -189,6 +189,15 @@ Edite o `config.json` antes de ligar:
 
 Depois de ligada, quase tudo dá pra mudar pelo próprio WhatsApp com os comandos de dono (`#menudono`).
 
+### 🔣 Prefixo
+```
+#mudarprefixo !               → troca o prefixo principal
+#multiprefixo 1               → aceita vários prefixos ao mesmo tempo (# ! . /)
+#addprefixo ?  ·  #rmprefixo ? → adiciona ou tira um prefixo extra
+#prefixos                     → mostra os prefixos
+```
+Esqueceu o prefixo? Mande só `prefixo` que a bot responde.
+
 ### 📝 Mudando as mensagens
 ```
 #msgs                         → lista todas as mensagens

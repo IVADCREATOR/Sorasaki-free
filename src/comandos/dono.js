@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { downloadMediaMessage } from "baileys";
-import { cfg, definir, soNumero } from "../lib/config.js";
+import { cfg, definir, soNumero, prefixosExtras } from "../lib/config.js";
 import { PASTA_DADOS } from "../lib/banco.js";
 import { t, PADRAO, definirTexto, resetarTexto } from "../lib/textos.js";
 
@@ -23,7 +23,51 @@ const mudarConfig = (chave, exemplo) => async (c) => {
 
 export default [
   { nomes: ["setnome"], ...DONO, desc: "nome", run: mudarConfig("nomeBot", "Sorasaki") },
-  { nomes: ["setprefixo"], ...DONO, desc: "símbolo", run: mudarConfig("prefixo", "!") },
+  {
+    nomes: ["mudarprefixo", "setprefixo", "prefixonovo"], ...DONO, desc: "símbolo",
+    run: async (c) => {
+      const novo = String(c.args[0] || "").trim();
+      if (!novo || novo.length > 3) return c.reply(`Use: ${c.prefixo}${c.cmd} !`);
+      definir("prefixo", novo);
+      return c.reply(`✅ Prefixo agora é *${novo}*`);
+    },
+  },
+  {
+    nomes: ["multiprefixo", "multiprefix"], ...DONO, desc: "1/0",
+    run: async (c) => {
+      const v = String(c.args[0] || "").toLowerCase();
+      const lista = prefixosExtras();
+      if (!["1", "0", "on", "off"].includes(v)) return c.reply(`🔣 Multiprefixo: *${cfg().multiprefixo ? "ligado" : "desligado"}*\nPrefixos: ${[cfg().prefixo || "#", ...lista].join(" ")}\n\n${c.prefixo}${c.cmd} 1 · ${c.prefixo}${c.cmd} 0`);
+      const on = v === "1" || v === "on";
+      definir("multiprefixo", on);
+      return c.reply(on ? `✅ Multiprefixo ligado: ${[cfg().prefixo || "#", ...lista].join(" ")}` : "✅ Multiprefixo desligado.");
+    },
+  },
+  {
+    nomes: ["addprefixo"], ...DONO, desc: "símbolo",
+    run: async (c) => {
+      const novo = String(c.args[0] || "").trim();
+      if (!novo || novo.length > 3) return c.reply(`Use: ${c.prefixo}${c.cmd} ?`);
+      const lista = prefixosExtras();
+      if (lista.includes(novo) || novo === cfg().prefixo) return c.reply("Esse prefixo já existe.");
+      definir("prefixos", [...lista, novo].slice(0, 10));
+      return c.reply(`✅ Prefixo *${novo}* adicionado.`);
+    },
+  },
+  {
+    nomes: ["rmprefixo", "delprefixo"], ...DONO, desc: "símbolo",
+    run: async (c) => {
+      const tira = String(c.args[0] || "").trim();
+      const lista = prefixosExtras();
+      if (!lista.includes(tira)) return c.reply(`Prefixos extras: ${lista.join(" ") || "nenhum"}`);
+      definir("prefixos", lista.filter((x) => x !== tira));
+      return c.reply(`✅ Prefixo *${tira}* removido.`);
+    },
+  },
+  {
+    nomes: ["prefixos"], ...DONO,
+    run: async (c) => c.reply(`🔣 Principal: *${cfg().prefixo || "#"}*\nExtras: ${prefixosExtras().join(" ") || "nenhum"}\nMultiprefixo: *${cfg().multiprefixo ? "ligado" : "desligado"}*`),
+  },
   { nomes: ["setrodape"], ...DONO, desc: "texto", run: mudarConfig("rodape", "Sorasaki · version free") },
   { nomes: ["setdononome"], ...DONO, desc: "nome", run: mudarConfig("nomeDono", "IVAD") },
 

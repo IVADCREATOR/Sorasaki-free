@@ -1,5 +1,6 @@
 import { ler, salvar } from "./banco.js";
 import { cfg, soNumero } from "./config.js";
+import { saldoDe, debitar } from "./saldo.js";
 
 const DIA = 86_400_000;
 const dados = () => ler("aluguel", { grupos: {}, planos: [{ dias: 7, valor: 5 }, { dias: 30, valor: 15 }], pendentes: {} });
@@ -43,6 +44,21 @@ export function adicionarDias(jid, dias, nome = "") {
   return g.ate;
 }
 
+export function definirPagador(jid, pagador, dias) {
+  const g = dados().grupos[jid];
+  if (!g) return;
+  if (pagador) g.pagador = soNumero(pagador);
+  if (dias) g.dias = dias;
+  salvarAluguel();
+}
+
+export function renovacaoAuto(jid, valor) {
+  const g = dados().grupos[jid];
+  if (!g) return false;
+  if (typeof valor === "boolean") { g.renovarAuto = valor; salvarAluguel(); }
+  return g.renovarAuto !== false;
+}
+
 export function removerAluguel(jid) {
   const d = dados();
   const tinha = Boolean(d.grupos[jid]);
@@ -78,6 +94,15 @@ export function iniciarVigia(sock, texto) {
         g.avisou1 = true;
         salvarAluguel();
         await sock.sendMessage(jid, { text: texto("aluguelAcabando", { p: cfg().prefixo }) }).catch(() => {});
+      }
+      if (falta <= 0 && !g.avisouFim && g.renovarAuto !== false && g.pagador) {
+        const plano = planos().find((x) => x.dias === g.dias) || planos()[0];
+        if (plano && saldoDe(g.pagador) >= plano.valor && debitar([g.pagador], plano.valor)) {
+          const ate = adicionarDias(jid, plano.dias, g.nome);
+          await sock.sendMessage(jid, { text: `🔄 Aluguel renovado com saldo: +${plano.dias} dias · vence ${dataBr(ate)}` }).catch(() => {});
+          await sock.sendMessage(`${g.pagador}@s.whatsapp.net`, { text: `🔄 Renovei o aluguel de *${g.nome || "seu grupo"}* com seu saldo (${reais(plano.valor)}).\n💵 Saldo: ${reais(saldoDe(g.pagador))}` }).catch(() => {});
+          continue;
+        }
       }
       if (falta <= 0 && !g.avisouFim) {
         g.avisouFim = true;

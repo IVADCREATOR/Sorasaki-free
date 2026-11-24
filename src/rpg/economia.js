@@ -2734,16 +2734,17 @@ def(["premium", "propriedadespremium", "lojapremium"], {}, async (c) => {
   const m = conta(c.jid, c.autorJid);
   if (!CFG_JOGO().premium && !c.ehDono) return c.responder("⭐ As propriedades premium estão fechadas no momento.");
   if (sub === "comprar") {
+    const comSaldo = c.args.slice(2).some((a) => /^saldo$/i.test(a));
     const it = ITENS[id];
     if (!it?.premium || it.off) return c.responder(`Não achei essa premium. Veja a lista: *${p}premium*`);
     const tem = m.itens?.[id] || 0;
     if (tem >= maxDe(id)) return c.responder(`⭐ Você já tem ${maxDe(id) > 1 ? `${tem}/${maxDe(id)} ` : ""}${it.emoji} *${it.nome}*.`);
     const K = await import("./caixa.js");
     lembrarNomeDoGrupo(c.jid, c.meta?.subject);
-    return K.cobrar(c, { tipo: "premium", valor: it.reais, chave: `premium:${id}`, descricao: `${it.nome} (propriedade premium)`, dados: { id, jid: c.jid, autor: c.autorJid } });
+    return K.cobrar(c, { metodo: comSaldo ? "saldo" : "pix", tipo: "premium", valor: it.reais, chave: `premium:${id}`, descricao: `${it.nome} (propriedade premium)`, dados: { id, jid: c.jid, autor: c.autorJid } });
   }
   const linhas = premiumAtivas().map(([k, it]) => `${it.emoji} *${it.nome}* (${k})\n   💳 ${reais(it.reais)} · rende ${porDia(it.renda)} fixo${m.itens?.[k] ? ` · ✅ ${maxDe(k) > 1 ? `${m.itens[k]}/${maxDe(k)}` : "sua"}` : ""}`);
-  return c.responder(`⭐ *PROPRIEDADES PREMIUM*\n_Compra única no Pix · renda fixa todo dia · crise não derruba · bônus da coleta nunca é negativo · é sua para sempre._\n\n${linhas.join("\n") || "_Nenhuma à venda agora._"}\n\n• *${p}premium comprar quiosque*\n• A renda cai junto no *${p}coletar*`);
+  return c.responder(`⭐ *PROPRIEDADES PREMIUM*\n_Compra única no Pix ou com saldo · renda fixa todo dia · crise não derruba · bônus da coleta nunca é negativo · é sua para sempre._\n\n${linhas.join("\n") || "_Nenhuma à venda agora._"}\n\n• Pix: *${p}premium comprar quiosque*\n• Saldo: *${p}premium comprar quiosque saldo*\n• A renda cai junto no *${p}coletar*`);
 });
 import("./caixa.js").then((K) => K.registrarProduto("premium", {
   aplicar: async (pg) => {

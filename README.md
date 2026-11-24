@@ -17,7 +17,7 @@ Feito por **IVAD**, desenvolvedor oficial da Sorasaki.
 - 🎬 Brincadeiras com GIF
 - 🤝 Parcerias e lista negra
 - 🎮 RPG completo com cassino e bolsa
-- 💎 Aluguel com Pix (opcional)
+- 💎 Aluguel com Pix, cartão e saldo (opcional)
 - 🎨 Tudo personalizável pelo dono
 - 📱 Termux, PC (Windows), Square Cloud e VPS
 
@@ -47,7 +47,7 @@ Feito por **IVAD**, desenvolvedor oficial da Sorasaki.
 | advertências (3 = ban) | interações com GIF (beijo, abraço, soco, chute...) | transmissão, entrar e sair |
 | marcar todos, hidetag, apagar | pergunta (8ball) | donos extras |
 | link, nome e descrição do grupo | | reiniciar |
-| parcerias (links liberados por dia) | | aluguel e Pix pelo Mercado Pago |
+| parcerias (links liberados por dia) | | aluguel com Pix, cartão e saldo |
 | lista negra (remove ao entrar) | | |
 
 ### 🎮 RPG completo
@@ -227,6 +227,19 @@ Para o grupo ser liberado sozinho por Pix:
 3. Pronto: `#alugar 30` gera o QR Code e o copia e cola, e o grupo é liberado assim que o pagamento cair.
 
 O token fica salvo só na pasta `data/`, que não vai para o GitHub. Para tirar: `#rmmp`.
+
+### 💵 Formas de pagamento
+```
+#alugar 30                    → Pix (QR Code + copia e cola)
+#alugar 30 cartao             → link do Mercado Pago (crédito até 12x ou débito)
+#alugar 30 saldo              → paga com o saldo da conta
+#adicionarsaldo 10            → coloca saldo pelo Pix (ou: #adicionarsaldo 10 cartao)
+#saldoreal                    → mostra o saldo (também aparece no #perfil)
+#renovarauto on/off           → com saldo, o aluguel renova sozinho no vencimento
+#premium comprar quiosque saldo → compra no RPG com o saldo
+#darsaldo 5511999999999 10    → (dono) dá ou tira saldo
+```
+Tudo é confirmado sozinho, sem comprovante. O saldo vale só dentro da bot e não tem reembolso.
 
 <p align="center"><img src="assets/neon/divisor.svg" width="100%"></p>
 

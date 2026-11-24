@@ -1,6 +1,7 @@
 import { ler, salvar } from "../lib/banco.js";
 import { mpLigado, criarPix, statusPagamento } from "../lib/mercadopago.js";
 import { reais } from "../lib/aluguel.js";
+import { saldoDe, debitar } from "../lib/saldo.js";
 import { sockAtual } from "./conexao.js";
 
 const produtos = new Map();
@@ -12,7 +13,14 @@ export async function falar(jid, texto, extra = {}) {
   await sockAtual()?.sendMessage(jid, { text: texto, ...extra }).catch(() => {});
 }
 
-export async function cobrar(c, { tipo, valor, descricao, dados = {} }) {
+export async function cobrar(c, { tipo, valor, descricao, dados = {}, metodo = "pix" }) {
+  if (metodo === "saldo") {
+    const ks = [c.autorJid, c.autorPn].filter(Boolean);
+    if (!debitar(ks, valor)) { await c.responder(`💵 Saldo insuficiente: ${reais(saldoDe(ks))}\nAdicione: ${c.prefixo}adicionarsaldo ${Math.max(1, Math.ceil(valor - saldoDe(ks)))}`); return null; }
+    await c.responder(`💵 Pago com saldo: ${reais(valor)}\nSaldo: ${reais(saldoDe(ks))}`);
+    await produtos.get(tipo)?.aplicar({ id: `saldo-${Date.now()}`, dados }).catch(() => {});
+    return { id: "saldo" };
+  }
   if (!mpLigado()) { await c.responder("💳 Pix não configurado pelo dono."); return null; }
   const pix = await criarPix({ valor, descricao: String(descricao).slice(0, 120), minutos: 30 }).catch(() => null);
   if (!pix) { await c.responder("⚠️ Não consegui gerar o Pix."); return null; }

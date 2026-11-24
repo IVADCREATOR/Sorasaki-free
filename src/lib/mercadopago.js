@@ -44,3 +44,30 @@ export async function statusPagamento(id) {
   const p = await chamar(`/v1/payments/${id}`);
   return p?.status || "desconhecido";
 }
+
+const validadeMP = (ms) => new Date(ms).toISOString().replace("Z", "-00:00");
+
+export async function criarLinkCartao({ valor, descricao, referencia, minutos = 60 }) {
+  const preco = Number(Number(valor).toFixed(2));
+  const p = await chamar("/checkout/preferences", {
+    method: "POST",
+    headers: { "X-Idempotency-Key": crypto.randomUUID() },
+    body: JSON.stringify({
+      items: [{ title: String(descricao).slice(0, 120), quantity: 1, unit_price: preco, currency_id: "BRL" }],
+      external_reference: referencia,
+      payment_methods: { excluded_payment_types: [{ id: "ticket" }, { id: "atm" }], installments: 12 },
+      expires: true,
+      expiration_date_from: validadeMP(Date.now() - 60_000),
+      expiration_date_to: validadeMP(Date.now() + minutos * 60_000),
+    }),
+  });
+  const token = String(cfg().mercadoPagoToken || "");
+  const link = token.startsWith("TEST-") ? p.sandbox_init_point || p.init_point : p.init_point;
+  if (!link) throw new Error("o Mercado Pago não devolveu o link");
+  return { id: String(p.id), link };
+}
+
+export async function pagoPorReferencia(referencia) {
+  const b = await chamar(`/v1/payments/search?external_reference=${encodeURIComponent(referencia)}&sort=date_created&criteria=desc`);
+  return (b?.results || []).find((x) => x.status === "approved") || null;
+}

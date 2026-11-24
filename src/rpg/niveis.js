@@ -1,4 +1,6 @@
 import { t } from "../lib/textos.js";
+import { saldoDe } from "../lib/saldo.js";
+import { reais } from "../lib/aluguel.js";
 import path from "node:path";
 import { CONFIG } from "./config.js";
 import { lerJson, salvarJson } from "./arquivo.js";
@@ -134,6 +136,10 @@ def(["perfil", "meuperfil", "meustatus"], G, async (c) => {
         const ap = (proprio && NOME[proprio]) || A.aparelhoDe(alvo, pn?.id, pn?.lid, pn?.phoneNumber, pn?.jid);
         return `\n📱 Aparelho: *${ap || "ainda não sei"}*`;
       } catch { return ""; }
+    })() +
+    (() => {
+      if (usuario(alvo) !== usuario(c.autorJid)) return "";
+      return `\n💵 Saldo: *${reais(saldoDe([c.autorJid, c.autorPn]))}*`;
     })();
   return c.responder((await import("./economia.js")).decorarPerfil(c.jid, alvo, texto), [alvo]);
 });
